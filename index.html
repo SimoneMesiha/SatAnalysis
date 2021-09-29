@@ -5,27 +5,204 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-     <script src="JS/test.js" async></script> 
-    <script src="https://d3js.org/d3.v7.min.js" ></script>
+    <!-- <script src="/JS/bar_chart.js" async></script> -->
+
+    <style>
+        .bar {
+            fill: lightblue;
+        }
+        .circ{
+            
+        }
+    </style>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+   
 
 
 </head>
 <body>
     <div class ="dropdown">
-        <select id="removeFirst" > choose a variable
-            <option></option>
-            <option value="# SAT takers"># sat takers</option>
-            <option value="SAT reading score">sat reading scores</option>
-            <option value="SAT math score">sat math score</option>
-            <option value="percentile rank">sat reading scores</option>
-            <option value="environment grade">env grade</option>
-            <option value="college and readiness grade">c&g grade</option>
-            <option value="% disability">% disability</option>
-            <option value="% overage">% overage</option>
-            <option value="% minority">% minority</option>
-            <option value="% ell">% ell</option>
+        <select id="variableID" onchange="upd(document.getElementById('variableID').value,'')"> choose a variable
+            <option value="Num of SAT Test Takers"># sat takers</option>
+            <option value="SAT Critical Reading Avg. Score">sat reading scores</option>
+            <option value="SAT Math Avg. Score">sat math scores</option>
+            <option value="Environment Grade">env grade</option>
+            <option value="College and Career Readiness Grade">college and readiness grade</option>
+            <option value="Enrollment">Enrollment</option>
+            <option value="% Students with Disabilities">% disability</option>
+            <option value="% Overage">% overage</option>
+            <option value="% Black or Hispanic">% minority</option>
+            <option value="% ELL">% ell</option>
+        </select>
+        <br>
+
+        <div class="dropdown">
+            <select id="variableID2"> choose variable 2
+                <option value=""></option>
+                <option value="# sat takers"># sat takers</option>
+                <option value="sat reading scores">sat reading scores</option>
+                <option value="sat math score">sat math score</option>
+                <option value="percentile rank">percentile rank</option>
+                <option value="env grade">env grade</option>
+                <option value="college and readiness grade">college and readiness grade</option>
+                <option value="% disability">% disability</option>
+                <option value="% overage">% overage</option>
+                <option value="% minority">% minority</option>
+                <option value="% ell">% ell</option>
+            </select>
+        <br>
+        <select id = "graphID" onchange="upd(document.getElementById('variableID').value,'')">
+            <option value="bar chart">bar chart</option>
+            <option value="pie chart"> pie chart</option>
+            <option value="scatterplot">scatterplot</option>
         </select>
     </div>
+
+    <p1 id="titleee" style="color:red; font-size: 30px;; padding-left: 35%;"></p1>
+    <br>
+    <br>
+    <svg width="1200" height="700" id="svg"> </svg>
+    <!-- <script src="/JS/bar_chart.js"></script> -->
+
+    
+    
+
+    <script>
+       
+        function upd(attr1, attr2) {
+            console.log(attr1)
+
+            if (attr1 == "Environment Grade" || attr1 == "College and Career Readiness Grade") {
+                document.getElementById('titleee').innerHTML ="This is a categorical variable"
+            } else {
+                document.getElementById('titleee').innerHTML = "This is a numerical variable"
+
+            }
+            // console.log(document.getElementById('titleee').innerHTML);
+            // console.log(document.getElementById("variableID").value)
+            if(document.getElementById("graphID").value=='bar chart'){
+                d3.select("svg").selectAll("*").remove(); //clears canvas everytime
+
+                
+                if(document.getElementById("titleee").innerHTML == "This is a categorical variable"){
+             
+                //adds margin to xy axis
+                    var svg = d3.select("svg"),
+                        margin = 200,
+                        width = svg.attr("width") - margin,
+                        height = svg.attr("height") - margin
+
+                    //adding text to the top
+                    svg.append("text")
+                        //.attr("transform", "translate(100,0)")
+                        .attr("x", 400)
+                        .attr("y", 50)
+                        .attr("font-size", "24px")
+                        .attr("font-weight","bold")
+                        .attr("text-decoration","underline")
+                        .text(attr1+"Data")
+
+                    var xScale = d3.scaleBand().range([0, width]).padding(0.4);//scaleBand() is used to construct a band scale. This is useful when our data has discrete bands.
+                    yScale = d3.scaleLinear().range([height, 0]);//a linear scale for the y-axis since this axis will show our fixation duration.
+
+                    var g = svg.append("g")
+                        .attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+                    d3.csv("./Data/cse332hw1.csv").then(function (data) {
+                        console.log(data);
+                        console.log(data.map(function (d) { return d.DBN; }));
+                        xScale.domain(data.map(function (d) { return d[attr1]; })); //provide domain values to the x and y scales, here it's X Scale which is Timestamp
+                        yScale.domain([0, d3.max(data, function (d) { return d['SAT Math Avg. Score'] })]); // domain value of Fixation Duration to y Scale
+
+                        g.append("g") //Another group element to have our x-axis grouped under one group element
+                            .attr("transform", "translate(0," + height + ")") // We then use the transform attribute to shift our x-axis towards the bottom of the SVG.
+                            .call(d3.axisBottom(xScale)) //We then insert x-axis on this group element using .call(d3.axisBottom(x)).
+                            .append("text")
+                            .attr("y", height - 250)
+                            .attr("x", width - 100)
+                            .attr("text-anchor", "end")
+                            .attr("stroke", "black")
+                            .text("Time Stamp");
+
+                        g.append("g") //Another group element to have our y-axis grouped under one group element
+                            .call(d3.axisLeft(yScale).tickFormat(function (d) {
+                                console.log(d);
+                                return d;
+                            })
+                                .ticks(10)) //We have also specified the number of ticks we would like our y-axis to have using ticks(10).
+                            .append("text")
+                            .attr("transform", "rotate(-90)")
+                            .attr("y", 6)
+                            .attr("dy", "-5.1em")
+                            .attr("text-anchor", "end")
+                            .attr("stroke", "black")
+                            .text("Fixation Duration");
+
+                        g.selectAll(".bar") //created dynamic bars with our data using the SVG rectangle element.
+                            .data(data)
+                            .enter().append("rect")
+                            .attr("class", "bar")
+                            .attr("x", function (d) { return xScale(d[attr1]); })  //x scale created earlier and pass the year value from our data.
+                            .attr("y", function (d) { return yScale(d['SAT Math Avg. Score']); }) // pass the data value to our y scale and receive the corresponding y value from the y range.
+                            .attr("width", xScale.bandwidth()) //width of our bars would be determined by the scaleBand() function.
+                            .attr("height", function (d) { return height - yScale(d['SAT Math Avg. Score']); }); //height of the bar would be calculated as height - yScale(d.value)
+                        //the height of the SVG minus the corresponding y-value of the bar from the y-scale
+                        console.log(g);
+
+                    });
+            }else{
+                var svg = d3.select("svg"),
+                        margin = 200,
+                        width = svg.attr("width") - margin,
+                        height = svg.attr("height") - margin
+
+                    //adding text to the top
+                    svg.append("text")
+                        //.attr("transform", "translate(100,0)")
+                        .attr("x", 400)
+                        .attr("y", 50)
+                        .attr("font-size", "24px")
+                        .attr("font-weight", "bold")
+                        .attr("text-decoration", "underline")
+                        .text(attr1 + "Data")
+            
+               var xScale = d3.scaleLinear().range([0, width]);//scaleBand() is used to construct a band scale. This is useful when our data has discrete bands.
+               yScale = d3.scaleLinear().range([height, 0]);//a linear scale for the y-axis since 
+
+                var g = svg.append("g")
+                    .attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+                d3.csv("./Data/cse332hw1.csv").then(function (data) {
+                    console.log(data);
+                    console.log(data.map(function (d) { return d.DBN; }));
+                    xScale.domain([0, d3.max(data, function (d) { return d['SAT Math Avg. Score'] })]) //provide domain values to the x and y scales, here it's X Scale which is Timestamp
+                    yScale.domain([0, d3.max(data, function (d) { return d['SAT Math Avg. Score'] })])
+
+                });
+            }
+
+
+
+
+
+
+
+
+
+
+                
+                
+            }else if(document.getElementById('graphID').value=='pie chart'){
+                  d3.select("svg").selectAll("*").remove(); //clears canvas everytime
+
+            }else{
+                // scatterplot
+            }
+        }
+    
+            
+    </script>
+  
 
 
 
