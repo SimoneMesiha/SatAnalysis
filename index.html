@@ -175,10 +175,52 @@
                 d3.csv("./Data/cse332hw1.csv").then(function (data) {
                     console.log(data);
                     console.log(data.map(function (d) { return d.DBN; }));
-                    xScale.domain([0, d3.max(data, function (d) { return d['SAT Math Avg. Score'] })]) //provide domain values to the x and y scales, here it's X Scale which is Timestamp
+                    xScale.domain([d3.min(data, function(d){return d[attr1]}), d3.max(data, function (d) { return d[attr1] })]) //provide domain values to the x and y scales, here it's X Scale which is Timestamp
                     yScale.domain([0, d3.max(data, function (d) { return d['SAT Math Avg. Score'] })])
 
+
+                     g.append("g") //Another group element to have our x-axis grouped under one group element
+                        .attr("transform", "translate(0," + height + ")") // Without this the x axis is at the top
+                        .call(d3.axisBottom(xScale)) //We then insert x-axis on this group element using .call(d3.axisBottom(x)).
+                        .append("text")
+                        .attr("y", height - 250)
+                        .attr("x", width - 100)
+                        .attr("text-anchor", "end")
+                        .attr("stroke", "black")
+                        .text("hello");
+
+                    g.append("g") //Another group element to have our y-axis grouped under one group element
+                        .call(d3.axisLeft(yScale).tickFormat(function (d) {
+                            console.log(d);
+                            return d;
+                        })
+                            .ticks(10)) //We have also specified the number of ticks we would like our y-axis to have using ticks(10).
+                        .append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 6)
+                        .attr("dy", "-5.1em")
+                        .attr("text-anchor", "end")
+                        .attr("stroke", "black")
+                        .text("math scores");
+
+
+                         g.selectAll(".bar") //created dynamic bars with our data using the SVG rectangle element.
+                        .data(data)
+                        .enter().append("rect")
+                        .attr("class", "bar")
+                        .attr("x", function (d) { return xScale(d[attr1]); })  //x scale created earlier and pass the year value from our data.
+                        .attr("y", function (d) { return yScale(d['SAT Math Avg. Score']); }) // pass the data value to our y scale and receive the corresponding y value from the y range.
+                        .attr("width", 2) //width of our bars would be determined by the scaleBand() function.
+                        .attr("height", function (d) { return height - yScale(d['SAT Math Avg. Score']); }); //height of the bar would be calculated as height - yScale(d.value)
+                    //the height of the SVG minus the corresponding y-value of the bar from the y-scale
+                    console.log(g);
+
+
+
                 });
+
+
+
             }
 
 
