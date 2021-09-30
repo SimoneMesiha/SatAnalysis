@@ -39,7 +39,6 @@
                 <option value="# sat takers"># sat takers</option>
                 <option value="sat reading scores">sat reading scores</option>
                 <option value="sat math score">sat math score</option>
-                <option value="percentile rank">percentile rank</option>
                 <option value="env grade">env grade</option>
                 <option value="college and readiness grade">college and readiness grade</option>
                 <option value="% disability">% disability</option>
@@ -249,12 +248,16 @@
                 svg.append("text")
 
                 d3.select("svg").selectAll("*").remove(); //clears canvas everytime
+
+            if(document.getElementById("titleee").innerHTML == "This is a categorical variable") {
+
+                var mainData;
                 var mapEnv = new Map()
                 mapEnv.set('A', 0);
                 mapEnv.set('B', 0);
                 mapEnv.set('C', 0);
                 mapEnv.set('D', 0);
-                mapEnv.set('E', 0);
+               // mapEnv.set('E', 0);
                 mapEnv.set('F', 0);
 
 
@@ -263,12 +266,13 @@
                 mapRead.set('B', 0);
                 mapRead.set('C', 0);
                 mapRead.set('D', 0);
-                mapRead.set('E', 0);
+               // mapRead.set('E', 0);
                 mapRead.set('F', 0);
+
 
                   d3.csv("./Data/cse332hw1.csv").then(function(data){
                       data.map(function(d){
-
+                            console.log(d)
                          if(d['Environment Grade']=='A'){
                             mapEnv.set('A', mapEnv.get('A')+1);
                          }else if(d['Environment Grade'] == 'B'){
@@ -303,20 +307,81 @@
                 envB = mapEnv.get('B')
                 envC = mapEnv.get('C')
                 envD = mapEnv.get('D')
-                envE = mapEnv.get('E')
+               //envE = mapEnv.get('E')
                 envF = mapEnv.get('F')
 
-                envArr =[envA,envB,envC,envD,envE,envF];
-                console.log(envArr);
+                reaA = mapRead.get('A')
+                reaB = mapRead.get('B')
+                reaC = mapRead.get('C')
+                reaD = mapRead.get('D')
+                reaF = mapRead.get('F')
 
-                 var vals = d3.pie()(envArr);
+                envArr =[envA,envB,envC,envD,envF];
+                reaArr = [reaA, reaB, reaC, reaD, reaF];
+
+                console.log(envArr);
+                console.log(reaArr);
+                var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                if(attr1=='Environment Grade'){
+                    mainData = envArr;
+                }else{
+                    mainData =  reaArr;
+                }
+
+            // if(attr1== 'Environment Grade'){}
+
+                 var vals = d3.pie()(mainData);
                  console.log(vals)
+                 var design = d3.arc()
+                                .padAngle(0.1)
+                                .padRadius(20)
+                                .innerRadius(0)
+                                .outerRadius(250)
+                svg.append("g").attr("transform", "translate(700,300)")
+                   .selectAll("path").data(vals)
+                   .enter()
+                   .append("path")
+                    .attr("d",design)
+                    .attr('color',color)
+                    .attr('fill',function(d){return color(d.data)})
+                    
+                d3.select("g").selectAll("text").data(vals)
+                   .enter().append("text").each(function(d){
+                       var a =design.centroid(d);
+                       d3.select(this).attr("x",a[0]).attr("y",a[1])
+                       .text(function(d){
+                           if(d.index==0){
+                               return 'A'
+                           }else if(d.index==1){
+                               return 'B'
+                           }else if(d.index==2){
+                               return 'C'
+                           }else if(d.index==3){
+                               return 'D'
+                           }else if(d.index==4){
+                               return 'F'
+                           }
+                       });
+                   })
+               
                       
                 
                       
                     });
-              
-          
+
+
+
+              //if it's numerical here
+                }else{
+                    if()
+                }
+
+
+
+
+
+
                     
 
             }else{
