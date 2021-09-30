@@ -11,9 +11,6 @@
         .bar {
             fill: lightblue;
         }
-        .circ{
-            
-        }
     </style>
     <script src="https://d3js.org/d3.v7.min.js"></script>
    
@@ -175,7 +172,7 @@
                 var g = svg.append("g")
                     .attr("transform", "translate(" + 100 + "," + 100 + ")");
 
-                d3.csv("./Data/cse332hw1.csv").then(function (data) {
+                d3.csv("./Data/cse332hw1.csv").then(function (data) {   
                     console.log(data);
                     console.log(data.map(function (d) { return d[attr1]; }));
                     if(attr1 !='Enrollment'){
@@ -243,7 +240,84 @@
                 
                 
             }else if(document.getElementById('graphID').value=='pie chart'){
-                  d3.select("svg").selectAll("*").remove(); //clears canvas everytime
+                 var svg = d3.select("svg"),
+                    margin = 200,
+                    width = svg.attr("width") - margin,
+                    height = svg.attr("height") - margin
+
+                //adding text to the top
+                svg.append("text")
+
+                d3.select("svg").selectAll("*").remove(); //clears canvas everytime
+                var mapEnv = new Map()
+                mapEnv.set('A', 0);
+                mapEnv.set('B', 0);
+                mapEnv.set('C', 0);
+                mapEnv.set('D', 0);
+                mapEnv.set('E', 0);
+                mapEnv.set('F', 0);
+
+
+                var mapRead = new Map()
+                mapRead.set('A', 0);
+                mapRead.set('B', 0);
+                mapRead.set('C', 0);
+                mapRead.set('D', 0);
+                mapRead.set('E', 0);
+                mapRead.set('F', 0);
+
+                  d3.csv("./Data/cse332hw1.csv").then(function(data){
+                      data.map(function(d){
+
+                         if(d['Environment Grade']=='A'){
+                            mapEnv.set('A', mapEnv.get('A')+1);
+                         }else if(d['Environment Grade'] == 'B'){
+                            mapEnv.set('B', mapEnv.get('B') + 1);   
+                        } else if (d['Environment Grade'] == 'C') {
+                             mapEnv.set('C', mapEnv.get('C') + 1);
+                        } else if (d['Environment Grade'] == 'D') {
+                             mapEnv.set('D', mapEnv.get('D') + 1);
+                        } else if (d['Environment Grade'] == 'E') {
+                             mapEnv.set('E', mapEnv.get('E') + 1);
+                        } else if (d['Environment Grade'] == 'F') {
+                             mapEnv.set('F', mapEnv.get('F') + 1);
+                        }
+
+                         if (d['College and Career Readiness Grade'] == 'A') {
+                              mapRead.set('A', mapRead.get('A') + 1);
+                          } else if (d['College and Career Readiness Grade'] == 'B') {
+                              mapRead.set('B', mapRead.get('B') + 1);
+                          } else if (d['College and Career Readiness Grade'] == 'C') {
+                              mapRead.set('C', mapRead.get('C') + 1);
+                          } else if (d['College and Career Readiness Grade'] == 'D') {
+                              mapRead.set('D', mapRead.get('D') + 1);
+                          } else if (d['College and Career Readiness Grade'] == 'E') {
+                              mapRead.set('E', mapRead.get('E') + 1);
+                          } else if (d['College and Career Readiness Grade'] == 'F') {
+                              mapRead.set('F', mapRead.get('F') + 1);
+                          }
+
+                          
+                })
+                envA = mapEnv.get('A')
+                envB = mapEnv.get('B')
+                envC = mapEnv.get('C')
+                envD = mapEnv.get('D')
+                envE = mapEnv.get('E')
+                envF = mapEnv.get('F')
+
+                envArr =[envA,envB,envC,envD,envE,envF];
+                console.log(envArr);
+
+                 var vals = d3.pie()(envArr);
+                 console.log(vals)
+                      
+                
+                      
+                    });
+              
+          
+                    
 
             }else{
                 // scatterplot
