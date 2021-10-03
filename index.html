@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -13,12 +14,13 @@
         }
     </style>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-   
+
 
 
 </head>
+
 <body>
-    <div class ="dropdown">
+    <div class="dropdown">
         <select id="variableID" onchange="upd(document.getElementById('variableID').value,'')"> choose a variable
             <option value="Num of SAT Test Takers"># sat takers</option>
             <option value="SAT Critical Reading Avg. Score">sat reading scores</option>
@@ -46,43 +48,337 @@
                 <option value="% minority">% minority</option>
                 <option value="% ell">% ell</option>
             </select>
+            <br>
+            <select id="graphID" onchange="upd(document.getElementById('variableID').value,'')">
+                <option value="bar chart">bar chart</option>
+                <option value="pie chart"> pie chart</option>
+                <option value="scatterplot">scatterplot</option>
+            </select>
+        </div>
+
+        <p1 id="titleee" style="color:red; font-size: 30px;; padding-left: 35%;"></p1>
         <br>
-        <select id = "graphID" onchange="upd(document.getElementById('variableID').value,'')">
-            <option value="bar chart">bar chart</option>
-            <option value="pie chart"> pie chart</option>
-            <option value="scatterplot">scatterplot</option>
-        </select>
-    </div>
+        <br>
+        <svg width="1200" height="600" id="svg"> </svg>
+        <!-- <script src="/JS/bar_chart.js"></script> -->
 
-    <p1 id="titleee" style="color:red; font-size: 30px;; padding-left: 35%;"></p1>
-    <br>
-    <br>
-    <svg width="800" height="600" id="svg"> </svg>
-    <!-- <script src="/JS/bar_chart.js"></script> -->
 
-    
-    
 
-    <script>
-       
-        function upd(attr1, attr2) {
-            console.log(attr1)
 
-            if (attr1 == "Environment Grade" || attr1 == "College and Career Readiness Grade") {
-                document.getElementById('titleee').innerHTML ="This is a categorical variable"
-            } else {
-                document.getElementById('titleee').innerHTML = "This is a numerical variable"
+        <script>
 
-            }
-            // console.log(document.getElementById('titleee').innerHTML);
-            // console.log(document.getElementById("variableID").value)
-            if(document.getElementById("graphID").value=='bar chart'){
-                d3.select("svg").selectAll("*").remove(); //clears canvas everytime
+            function upd(attr1, attr2) {
+                console.log(attr1)
 
-                
-                if(document.getElementById("titleee").innerHTML == "This is a categorical variable"){
-             
-                //adds margin to xy axis
+                if (attr1 == "Environment Grade" || attr1 == "College and Career Readiness Grade") {
+                    document.getElementById('titleee').innerHTML = "This is a categorical variable"
+                } else {
+                    document.getElementById('titleee').innerHTML = "This is a numerical variable"
+
+                }
+                // console.log(document.getElementById('titleee').innerHTML);
+                // console.log(document.getElementById("variableID").value)
+                 d3.select("svg").selectAll("*").remove(); //clears canvas everytime
+                if (document.getElementById("graphID").value == 'bar chart') {
+                   
+
+
+                    if (document.getElementById("titleee").innerHTML == "This is a categorical variable") {
+
+                        //adds margin to xy axis
+                        var svg = d3.select("svg"),
+                            margin = 200,
+                            width = svg.attr("width") - margin,
+                            height = svg.attr("height") - margin
+
+                        //adding text to the top
+                        svg.append("text")
+                            //.attr("transform", "translate(100,0)")
+                            .attr("x", 400)
+                            .attr("y", 50)
+                            .attr("font-size", "24px")
+                            .attr("font-weight", "bold")
+                            .attr("text-decoration", "underline")
+                            .text(attr1 + " Data")
+
+                        // var xScale = d3.scaleBand().range([0, width]).padding(0.4);//scaleband to make
+                        // //all the element the x axis the same width
+                        // var yScale = d3.scaleLinear().range([height, 0]);//a linear scale for the y-axis 
+
+                        var g = svg.append("g") // adding a grouping of svg elements. Inside this we will 
+                            //update our values
+                            .attr("transform", "translate(" + 100 + "," + 100 + ")"); // just position it nicely
+                        mapEnv = new Map();
+                        mapEnv.set('A', 0);
+                        mapEnv.set('B', 0);
+                        mapEnv.set('C', 0);
+                        mapEnv.set('D', 0);
+                        mapEnv.set('F', 0);
+
+                        mapRead = new Map();
+                        mapRead.set('A', 0);
+                        mapRead.set('B', 0);
+                        mapRead.set('C', 0);
+                        mapRead.set('D', 0);
+                        mapRead.set('F', 0);
+
+                        d3.csv("./Data/cse332hw1.csv").then(function (data) {
+                            // data is literally every value in the csv so we jave to map through it
+                            data.map(function (d) {
+                                console.log(d)
+                                if (d['Environment Grade'] == 'A') {
+                                    mapEnv.set('A', mapEnv.get('A') + 1);
+                                } else if (d['Environment Grade'] == 'B') {
+                                    mapEnv.set('B', mapEnv.get('B') + 1);
+                                } else if (d['Environment Grade'] == 'C') {
+                                    mapEnv.set('C', mapEnv.get('C') + 1);
+                                } else if (d['Environment Grade'] == 'D') {
+                                    mapEnv.set('D', mapEnv.get('D') + 1);
+                                } else if (d['Environment Grade'] == 'E') {
+                                    mapEnv.set('E', mapEnv.get('E') + 1);
+                                } else if (d['Environment Grade'] == 'F') {
+                                    mapEnv.set('F', mapEnv.get('F') + 1);
+                                }
+
+                                if (d['College and Career Readiness Grade'] == 'A') {
+                                    mapRead.set('A', mapRead.get('A') + 1);
+                                } else if (d['College and Career Readiness Grade'] == 'B') {
+                                    mapRead.set('B', mapRead.get('B') + 1);
+                                } else if (d['College and Career Readiness Grade'] == 'C') {
+                                    mapRead.set('C', mapRead.get('C') + 1);
+                                } else if (d['College and Career Readiness Grade'] == 'D') {
+                                    mapRead.set('D', mapRead.get('D') + 1);
+                                } else if (d['College and Career Readiness Grade'] == 'E') {
+                                    mapRead.set('E', mapRead.get('E') + 1);
+                                } else if (d['College and Career Readiness Grade'] == 'F') {
+                                    mapRead.set('F', mapRead.get('F') + 1);
+                                }
+
+
+                            })
+                            envA = mapEnv.get('A')
+                            envB = mapEnv.get('B')
+                            envC = mapEnv.get('C')
+                            envD = mapEnv.get('D')
+                            //envE = mapEnv.get('E')
+                            envF = mapEnv.get('F')
+
+                            reaA = mapRead.get('A')
+                            reaB = mapRead.get('B')
+                            reaC = mapRead.get('C')
+                            reaD = mapRead.get('D')
+                            reaF = mapRead.get('F')
+
+                            envArr = [envA, envB, envC, envD, envF];
+                            reaArr = [reaA, reaB, reaC, reaD, reaF];
+                            console.log(envArr);
+                            console.log(reaArr);
+
+
+                            //scaleband to make
+                            //all the element the x axis the same width
+                            data.sort((a, b) => a[attr1] > b[attr1] && 1 || -1); // sort the data for x axis
+                            var xScale = d3.scaleBand().range([0, width]).padding(0.4).domain(data.map(function (d) {
+                                return d[attr1];
+                            }));;
+
+                            //a linear scale for the y-axis 
+                            var yScale = d3.scaleLinear().range([height, 0]).domain([0, 130]);;
+                            //console.log(data); // now we access to the data
+                            //console.log(data.map(function (d) { return d.DBN; }));
+
+                            g.append("g") //Another group element to have our x-axis grouped under one group element
+                                //d3.axisBottom(xScale) creates a bunch of svg elements. we are running this on the newly appended element "g"
+
+                                .call(d3.axisBottom(xScale).tickSizeOuter(0)) //We then insert x-axis on this group element using .call(d3.axisBottom(x)).
+                                // we are moving the x axis down so it's at the bottom
+                                .attr("transform", "translate(0," + height + ")")
+                                .append("text")
+                                .attr("x", 350)
+                                .attr("y", 30)
+                                .attr("text-anchor", "end")
+                                .attr("stroke", "black")
+                                .text(attr1)
+
+
+                            g.append("g") //Another group element to have our y-axis grouped under one group element
+                                //d3.axisLeft(xycale) creates a bunch of svg elements. we are running this on the newly appended element "g"
+                                .call(d3.axisLeft(yScale)
+                                    .ticks(10).tickSizeOuter(0)) // the way ticks work here is that d3 does whatever it wants regardless lol
+                                .append("text")
+                                .attr("transform", "rotate(-90)")
+                                .attr("y", 6)
+                                .attr("dy", "-5.1em")
+                                .attr("x", -150)
+                                .attr("text-anchor", "end")
+                                .attr("stroke", "black")
+                                .text("val");
+
+                            console.log(mapEnv);
+                            g.selectAll(".bar") //created dynamic bars with our data using the SVG rectangle element.
+                                .data(data)
+                                .enter()
+                                .append("rect")
+                                .attr("class", "bar")
+                                .attr("x", function (d) { return xScale(d[attr1]); })  //x scale created earlier and pass the year value from our data.
+                                .attr("y", function (d) {
+                                    if (attr1 == 'Environment Grade') {
+                                        if (d['Environment Grade'] == 'A') {
+                                            return yScale(envArr[0]);
+                                        } else if (d['Environment Grade'] == 'B') {
+                                            return yScale(envArr[1]);
+                                        } else if (d['Environment Grade'] == 'C') {
+                                            return yScale(envArr[2]);
+                                        } else if (d['Environment Grade'] == 'D') {
+                                            return yScale(envArr[3])
+                                        } else {
+                                            return yScale(envArr[4]);
+                                        }
+                                    } else {
+                                        if (attr1 == 'College and Career Readiness Grade') {
+                                            if (d['College and Career Readiness Grade'] == 'A') {
+                                                return yScale(reaArr[0]);
+                                            } else if (d['College and Career Readiness Grade'] == 'B') {
+                                                return yScale(reaArr[1]);
+                                            } else if (d['College and Career Readiness Grade'] == 'C') {
+                                                return yScale(reaArr[2]);
+                                            } else if (d['College and Career Readiness Grade'] == 'D') {
+                                                return yScale(reaArr[3])
+                                            } else {
+                                                return yScale(reaArr[4]);
+                                            }
+                                        }
+                                    }
+                                }) // pass the data value to our y scale and receive the corresponding y value from the y range.
+                                .attr("width", xScale.bandwidth()) //width of our bars would be determined by the scaleBand() function.
+                                .attr("height", function (d) {
+                                    if (attr1 == 'Environment Grade') {
+                                        if (d['Environment Grade'] == 'A') {
+                                            return height - yScale(envArr[0]);
+                                        } else if (d['Environment Grade'] == 'B') {
+                                            return height - yScale(envArr[1]);
+                                        } else if (d['Environment Grade'] == 'C') {
+                                            return height - yScale(envArr[2]);
+                                        } else if (d['Environment Grade'] == 'D') {
+                                            return height - yScale(envArr[3]);
+                                        } else {
+                                            return height - yScale(envArr[4]);
+                                        }
+                                    } else {
+                                        if (attr1 == 'College and Career Readiness Grade') {
+                                            if (d['College and Career Readiness Grade'] == 'A') {
+                                                return height - yScale(reaArr[0]);
+                                            } else if (d['College and Career Readiness Grade'] == 'B') {
+                                                return height - yScale(reaArr[1]);
+                                            } else if (d['College and Career Readiness Grade'] == 'C') {
+                                                return height - yScale(reaArr[2]);
+                                            } else if (d['College and Career Readiness Grade'] == 'D') {
+                                                return height - yScale(reaArr[3]);
+                                            } else {
+                                                return height - yScale(reaArr[4]);
+                                            }
+
+                                        }
+                                    }
+                                }); //height of the bar would be calculated as height - yScale(d.value)
+                            //the height of the SVG minus the corresponding y-value of the bar from the y-scale
+                            console.log(g);
+
+                        });
+
+
+                        // bar chart but not categorical
+                    } else {
+                        var svg = d3.select("svg"),
+                            margin = 200,
+                            width = svg.attr("width") - margin,
+                            height = svg.attr("height") - margin
+
+                        //adding text to the top
+                        svg.append("text")
+                            //.attr("transform", "translate(100,0)")
+                            .attr("x", 400)
+                            .attr("y", 50)
+                            .attr("font-size", "24px")
+                            .attr("font-weight", "bold")
+                            .attr("text-decoration", "underline")
+                            .text(attr1 + " Data")
+
+                        var xScale = d3.scaleLinear().range([0, width]);
+                        yScale = d3.scaleLinear().range([height, 0]);
+                        var g = svg.append("g")
+                            .attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+                        d3.csv("./Data/cse332hw1.csv").then(function (data) {
+                            console.log(data);
+                            console.log(data.map(function (d) { return d[attr1]; console.log(d[attr1]) }));
+                            if (attr1 == 'Enrollment') {
+                              xScale.domain([0,5500])
+                                console.log()
+                              
+                            } else if((attr1 == 'Num of SAT Test Takers')) {
+                                xScale.domain([0, 1300]);
+                            }else if(attr1 == 'SAT Critical Reading Avg. Score') {
+                                xScale.domain([200, 800]);
+                            }else if(attr1 =='SAT Math Avg. Score'){
+                                 xScale.domain([200, 800]);
+                            }else{
+                                xScale.domain([0,1])
+                            }
+
+                            yScale.domain([0,
+                                d3.max(data, function (d) {
+                                    return d['SAT Math Avg. Score']
+                                })])
+
+
+                            g.append("g")
+                                .attr("transform", "translate(0," + height + ")")
+                                .call(d3.axisBottom().tickSizeOuter(0).scale(xScale).ticks(7))
+
+                                .append("text")
+                                .attr("y", height - 250)
+                                .attr("x", width - 100)
+                                .attr("text-anchor", "end")
+                                .attr("stroke", "black")
+                                .text("hello");
+
+                            g.append("g")
+                                .call(d3.axisLeft(yScale)
+                                    .ticks(10).tickSizeOuter(0))
+                                .append("text")
+                                .attr("transform", "rotate(-90)")
+                                .attr("y", 6)
+                                .attr("dy", "-5.1em")
+                                .attr("text-anchor", "end")
+                                .attr("stroke", "black")
+                                .text("math scores");
+
+
+                            g.selectAll(".bar")
+                                .data(data)
+                                .enter().append("rect")
+                                .attr("class", "bar")
+                                .attr("x", function (d) { return xScale(d[attr1]); })
+                                .attr("y", function (d) { return yScale(d['SAT Math Avg. Score']); })
+                                .attr("width", 2)
+                                .attr("height", function (d) { return height - yScale(d['SAT Math Avg. Score']); });
+                            console.log(g);
+                        });
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
+                } else if (document.getElementById('graphID').value == 'pie chart') {
                     var svg = d3.select("svg"),
                         margin = 200,
                         width = svg.attr("width") - margin,
@@ -90,636 +386,347 @@
 
                     //adding text to the top
                     svg.append("text")
-                        //.attr("transform", "translate(100,0)")
-                        .attr("x", 400)
-                        .attr("y", 50)
-                        .attr("font-size", "24px")
-                        .attr("font-weight","bold")
-                        .attr("text-decoration","underline")
-                        .text(attr1+" Data")
 
-                    // var xScale = d3.scaleBand().range([0, width]).padding(0.4);//scaleband to make
-                    // //all the element the x axis the same width
-                    // var yScale = d3.scaleLinear().range([height, 0]);//a linear scale for the y-axis 
+                    d3.select("svg").selectAll("*").remove(); //clears canvas everytime
 
-                    var g = svg.append("g") // adding a grouping of svg elements. Inside this we will 
-                    //update our values
-                       .attr("transform", "translate(" + 100 + "," + 100 + ")"); // just position it nicely
-                    mapEnv = new Map();
-                    mapEnv.set('A', 0);
-                    mapEnv.set('B', 0);
-                    mapEnv.set('C', 0);
-                    mapEnv.set('D', 0);
-                    mapEnv.set('F', 0);
+                    if (document.getElementById("titleee").innerHTML == "This is a categorical variable") {
 
-                    mapRead = new Map();
-                    mapRead.set('A', 0);
-                    mapRead.set('B', 0);
-                    mapRead.set('C', 0);
-                    mapRead.set('D', 0);
-                    mapRead.set('F', 0);
-
-                    d3.csv("./Data/cse332hw1.csv").then(function (data) {
-                        // data is literally every value in the csv so we jave to map through it
-                      data.map(function (d) {
-                            console.log(d)
-                            if (d['Environment Grade'] == 'A') {
-                                mapEnv.set('A', mapEnv.get('A') + 1);
-                            } else if (d['Environment Grade'] == 'B') {
-                                mapEnv.set('B', mapEnv.get('B') + 1);
-                            } else if (d['Environment Grade'] == 'C') {
-                                mapEnv.set('C', mapEnv.get('C') + 1);
-                            } else if (d['Environment Grade'] == 'D') {
-                                mapEnv.set('D', mapEnv.get('D') + 1);
-                            } else if (d['Environment Grade'] == 'E') {
-                                mapEnv.set('E', mapEnv.get('E') + 1);
-                            } else if (d['Environment Grade'] == 'F') {
-                                mapEnv.set('F', mapEnv.get('F') + 1);
-                            }
-
-                            if (d['College and Career Readiness Grade'] == 'A') {
-                                mapRead.set('A', mapRead.get('A') + 1);
-                            } else if (d['College and Career Readiness Grade'] == 'B') {
-                                mapRead.set('B', mapRead.get('B') + 1);
-                            } else if (d['College and Career Readiness Grade'] == 'C') {
-                                mapRead.set('C', mapRead.get('C') + 1);
-                            } else if (d['College and Career Readiness Grade'] == 'D') {
-                                mapRead.set('D', mapRead.get('D') + 1);
-                            } else if (d['College and Career Readiness Grade'] == 'E') {
-                                mapRead.set('E', mapRead.get('E') + 1);
-                            } else if (d['College and Career Readiness Grade'] == 'F') {
-                                mapRead.set('F', mapRead.get('F') + 1);
-                            }
+                        var mainData;
+                        var mapEnv = new Map()
+                        mapEnv.set('A', 0);
+                        mapEnv.set('B', 0);
+                        mapEnv.set('C', 0);
+                        mapEnv.set('D', 0);
+                        // mapEnv.set('E', 0);
+                        mapEnv.set('F', 0);
 
 
-                        })
-                        envA = mapEnv.get('A')
-                        envB = mapEnv.get('B')
-                        envC = mapEnv.get('C')
-                        envD = mapEnv.get('D')
-                        //envE = mapEnv.get('E')
-                        envF = mapEnv.get('F')
-
-                        reaA = mapRead.get('A')
-                        reaB = mapRead.get('B')
-                        reaC = mapRead.get('C')
-                        reaD = mapRead.get('D')
-                        reaF = mapRead.get('F')
-
-                        envArr = [envA, envB, envC, envD, envF];
-                        reaArr = [reaA, reaB, reaC, reaD, reaF];
-                        console.log(envArr);
-                        console.log(reaArr);
+                        var mapRead = new Map()
+                        mapRead.set('A', 0);
+                        mapRead.set('B', 0);
+                        mapRead.set('C', 0);
+                        mapRead.set('D', 0);
+                        // mapRead.set('E', 0);
+                        mapRead.set('F', 0);
 
 
-                        //scaleband to make
-                        //all the element the x axis the same width
-                        data.sort((a,b)=>a[attr1] > b[attr1] && 1||-1); // sort the data for x axis
-                        var xScale = d3.scaleBand().range([0, width]).padding(0.4).domain(data.map(function (d) {
-                             return d[attr1]; }));;
-                       
-                        //a linear scale for the y-axis 
-                        var yScale = d3.scaleLinear().range([height, 0]).domain([0,130]);;
-                        //console.log(data); // now we access to the data
-                        //console.log(data.map(function (d) { return d.DBN; }));
-
-                        g.append("g") //Another group element to have our x-axis grouped under one group element
-                            //d3.axisBottom(xScale) creates a bunch of svg elements. we are running this on the newly appended element "g"
-                            
-                            .call(d3.axisBottom(xScale).tickSizeOuter(0)) //We then insert x-axis on this group element using .call(d3.axisBottom(x)).
-                            // we are moving the x axis down so it's at the bottom
-                            .attr("transform", "translate(0," + height + ")")
-                            .append("text")
-                            .attr("x", 350)
-                            .attr("y",30)
-                            .attr("text-anchor", "end")
-                            .attr("stroke", "black")
-                            .text(attr1)
-                            
-
-                        g.append("g") //Another group element to have our y-axis grouped under one group element
-                        //d3.axisLeft(xycale) creates a bunch of svg elements. we are running this on the newly appended element "g"
-                            .call(d3.axisLeft(yScale)
-                            .ticks(10).tickSizeOuter(0)) // the way ticks work here is that d3 does whatever it wants regardless lol
-                            .append("text")
-                            .attr("transform", "rotate(-90)")
-                            .attr("y", 6)
-                            .attr("dy", "-5.1em")
-                            .attr("x",-150)
-                            .attr("text-anchor", "end")
-                            .attr("stroke", "black")
-                            .text("val");
-                        
-                            console.log(mapEnv);
-                        g.selectAll(".bar") //created dynamic bars with our data using the SVG rectangle element.
-                            .data(data)
-                            .enter()
-                            .append("rect")
-                            .attr("class", "bar")
-                            .attr("x", function (d) { return xScale(d[attr1]); })  //x scale created earlier and pass the year value from our data.
-                            .attr("y", function (d) { 
-                            if(attr1 =='Environment Grade'){
-                               if(d['Environment Grade']=='A'){
-                                return yScale(envArr[0]); 
-                               }else if(d['Environment Grade'] == 'B') {
-                                   return yScale(envArr[1]);
-                               }else if(d['Environment Grade'] == 'C'){
-                                   return yScale(envArr[2]);
-                               }else if(d['Environment Grade'] == 'D'){
-                                   return yScale(envArr[3])
-                               }else{
-                                   return yScale(envArr[4]);
-                               }
-                            }else{
-                                if (attr1 == 'College and Career Readiness Grade') {
-                                    if (d['College and Career Readiness Grade'] == 'A') {
-                                        return yScale(reaArr[0]);
-                                    } else if (d['College and Career Readiness Grade'] == 'B') {
-                                        return yScale(reaArr[1]);
-                                    } else if (d['College and Career Readiness Grade'] == 'C') {
-                                        return yScale(reaArr[2]);
-                                    } else if (d['College and Career Readiness Grade'] == 'D') {
-                                        return yScale(reaArr[3])
-                                    } else {
-                                        return yScale(reaArr[4]);
-                                    }
-                            }
-                            }
-                        }) // pass the data value to our y scale and receive the corresponding y value from the y range.
-                            .attr("width", xScale.bandwidth()) //width of our bars would be determined by the scaleBand() function.
-                            .attr("height", function (d) {
-                             if (attr1 == 'Environment Grade') {
-                                if(d['Environment Grade'] == 'A'){
-                                 return height - yScale(envArr[0]); 
-                                }else if(d['Environment Grade'] == 'B'){
-                                    return height - yScale(envArr[1]);
-                                }else if(d['Environment Grade'] == 'C'){
-                                    return height - yScale(envArr[2]);
-                                }else if(d['Environment Grade'] == 'D') {
-                                    return height - yScale(envArr[3]);
-                                }else{
-                                    return height-yScale(envArr[4]);
+                        d3.csv("./Data/cse332hw1.csv").then(function (data) {
+                            data.map(function (d) {
+                                console.log(d)
+                                if (d['Environment Grade'] == 'A') {
+                                    mapEnv.set('A', mapEnv.get('A') + 1);
+                                } else if (d['Environment Grade'] == 'B') {
+                                    mapEnv.set('B', mapEnv.get('B') + 1);
+                                } else if (d['Environment Grade'] == 'C') {
+                                    mapEnv.set('C', mapEnv.get('C') + 1);
+                                } else if (d['Environment Grade'] == 'D') {
+                                    mapEnv.set('D', mapEnv.get('D') + 1);
+                                } else if (d['Environment Grade'] == 'E') {
+                                    mapEnv.set('E', mapEnv.get('E') + 1);
+                                } else if (d['Environment Grade'] == 'F') {
+                                    mapEnv.set('F', mapEnv.get('F') + 1);
                                 }
-                            }else{
-                                 if (attr1 == 'College and Career Readiness Grade') {
-                                     if (d['College and Career Readiness Grade'] == 'A') {
-                                         return height - yScale(reaArr[0]);
-                                     } else if (d['College and Career Readiness Grade'] == 'B') {
-                                         return height - yScale(reaArr[1]);
-                                     } else if (d['College and Career Readiness Grade'] == 'C') {
-                                         return height - yScale(reaArr[2]);
-                                     } else if (d['College and Career Readiness Grade'] == 'D') {
-                                         return height - yScale(reaArr[3]);
-                                     } else {
-                                         return height - yScale(reaArr[4]);
-                                     }
 
+                                if (d['College and Career Readiness Grade'] == 'A') {
+                                    mapRead.set('A', mapRead.get('A') + 1);
+                                } else if (d['College and Career Readiness Grade'] == 'B') {
+                                    mapRead.set('B', mapRead.get('B') + 1);
+                                } else if (d['College and Career Readiness Grade'] == 'C') {
+                                    mapRead.set('C', mapRead.get('C') + 1);
+                                } else if (d['College and Career Readiness Grade'] == 'D') {
+                                    mapRead.set('D', mapRead.get('D') + 1);
+                                } else if (d['College and Career Readiness Grade'] == 'E') {
+                                    mapRead.set('E', mapRead.get('E') + 1);
+                                } else if (d['College and Career Readiness Grade'] == 'F') {
+                                    mapRead.set('F', mapRead.get('F') + 1);
+                                }
+
+
+                            })
+                            envA = mapEnv.get('A')
+                            envB = mapEnv.get('B')
+                            envC = mapEnv.get('C')
+                            envD = mapEnv.get('D')
+                            //envE = mapEnv.get('E')
+                            envF = mapEnv.get('F')
+
+                            reaA = mapRead.get('A')
+                            reaB = mapRead.get('B')
+                            reaC = mapRead.get('C')
+                            reaD = mapRead.get('D')
+                            reaF = mapRead.get('F')
+
+                            envArr = [envA, envB, envC, envD, envF];
+                            reaArr = [reaA, reaB, reaC, reaD, reaF];
+
+                            console.log(envArr);
+                            console.log(reaArr);
+                            var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                            if (attr1 == 'Environment Grade') {
+                                mainData = envArr;
+                            } else {
+                                mainData = reaArr;
                             }
-                        }
-                            }); //height of the bar would be calculated as height - yScale(d.value)
-                        //the height of the SVG minus the corresponding y-value of the bar from the y-scale
-                        console.log(g);
 
-                    });
+                            // if(attr1== 'Environment Grade'){}
 
-
-                    // bar chart but not categorical
-            }else{
-                var svg = d3.select("svg"),
-                        margin = 200,
-                        width = svg.attr("width") - margin,
-                        height = svg.attr("height") - margin
-
-                    //adding text to the top
-                    svg.append("text")
-                        //.attr("transform", "translate(100,0)")
-                        .attr("x", 400)
-                        .attr("y", 50)
-                        .attr("font-size", "24px")
-                        .attr("font-weight", "bold")
-                        .attr("text-decoration", "underline")
-                        .text(attr1 + " Data")
-            
-               var xScale = d3.scaleLinear().range([0, width]);
-               yScale = d3.scaleLinear().range([height, 0]);
-                var g = svg.append("g")
-                    .attr("transform", "translate(" + 100 + "," + 100 + ")");
-
-                d3.csv("./Data/cse332hw1.csv").then(function (data) {   
-                    console.log(data);
-                    console.log(data.map(function (d) { return d[attr1];console.log(d[attr1]) }));
-                    if(attr1 !='Enrollment'){
-                    max = d3.max(data, function (d) {
-                            return d[attr1]
-                    })
-                    console.log()
-                    xScale.domain([0,parseInt(max)*1.05]) 
-                    }else{
-                        xScale.domain([0,5500]);
-                    }
-
-                    if(attr1=='Num of SAT Test Takers'){
-                        xScale.domain([0,1300]);
-                    }
-                    yScale.domain([0, 
-                    d3.max(data, function (d) { 
-                        return d['SAT Math Avg. Score']
-                     })])
-
-                    
-                     g.append("g") 
-                        .attr("transform", "translate(0," + height + ")") 
-                        .call(d3.axisBottom().tickSizeOuter(0).scale(xScale).ticks(7)) 
-                      
-                        .append("text")
-                        .attr("y", height - 250)
-                        .attr("x", width - 100)
-                        .attr("text-anchor", "end")
-                        .attr("stroke", "black")
-                        .text("hello");
-
-                    g.append("g") 
-                        .call(d3.axisLeft(yScale)
-                        .ticks(10).tickSizeOuter(0)) 
-                        .append("text")
-                        .attr("transform", "rotate(-90)")
-                        .attr("y", 6)
-                        .attr("dy", "-5.1em")
-                        .attr("text-anchor", "end")
-                        .attr("stroke", "black")
-                        .text("math scores");
-
-                       
-                         g.selectAll(".bar") 
-                        .data(data)
-                        .enter().append("rect")
-                        .attr("class", "bar")
-                        .attr("x", function (d) { return xScale(d[attr1]); })  
-                        .attr("y", function (d) { return yScale(d['SAT Math Avg. Score']); }) 
-                        .attr("width", 2) 
-                        .attr("height", function (d) { return height - yScale(d['SAT Math Avg. Score']); }); 
-                    console.log(g);
-                });
-            }
-
-
-
-
-
-
-
-
-
-
-                
-                
-            }else if(document.getElementById('graphID').value=='pie chart'){
-                 var svg = d3.select("svg"),
-                    margin = 200,
-                    width = svg.attr("width") - margin,
-                    height = svg.attr("height") - margin
-
-                //adding text to the top
-                svg.append("text")
-
-                d3.select("svg").selectAll("*").remove(); //clears canvas everytime
-
-            if(document.getElementById("titleee").innerHTML == "This is a categorical variable") {
-
-                var mainData;
-                var mapEnv = new Map()
-                mapEnv.set('A', 0);
-                mapEnv.set('B', 0);
-                mapEnv.set('C', 0);
-                mapEnv.set('D', 0);
-               // mapEnv.set('E', 0);
-                mapEnv.set('F', 0);
-
-
-                var mapRead = new Map()
-                mapRead.set('A', 0);
-                mapRead.set('B', 0);
-                mapRead.set('C', 0);
-                mapRead.set('D', 0);
-               // mapRead.set('E', 0);
-                mapRead.set('F', 0);
-
-
-                  d3.csv("./Data/cse332hw1.csv").then(function(data){
-                      data.map(function(d){
-                            console.log(d)
-                         if(d['Environment Grade']=='A'){
-                            mapEnv.set('A', mapEnv.get('A')+1);
-                         }else if(d['Environment Grade'] == 'B'){
-                            mapEnv.set('B', mapEnv.get('B') + 1);   
-                        } else if (d['Environment Grade'] == 'C') {
-                             mapEnv.set('C', mapEnv.get('C') + 1);
-                        } else if (d['Environment Grade'] == 'D') {
-                             mapEnv.set('D', mapEnv.get('D') + 1);
-                        } else if (d['Environment Grade'] == 'E') {
-                             mapEnv.set('E', mapEnv.get('E') + 1);
-                        } else if (d['Environment Grade'] == 'F') {
-                             mapEnv.set('F', mapEnv.get('F') + 1);
-                        }
-
-                         if (d['College and Career Readiness Grade'] == 'A') {
-                              mapRead.set('A', mapRead.get('A') + 1);
-                          } else if (d['College and Career Readiness Grade'] == 'B') {
-                              mapRead.set('B', mapRead.get('B') + 1);
-                          } else if (d['College and Career Readiness Grade'] == 'C') {
-                              mapRead.set('C', mapRead.get('C') + 1);
-                          } else if (d['College and Career Readiness Grade'] == 'D') {
-                              mapRead.set('D', mapRead.get('D') + 1);
-                          } else if (d['College and Career Readiness Grade'] == 'E') {
-                              mapRead.set('E', mapRead.get('E') + 1);
-                          } else if (d['College and Career Readiness Grade'] == 'F') {
-                              mapRead.set('F', mapRead.get('F') + 1);
-                          }
-
-                          
-                })
-                envA = mapEnv.get('A')
-                envB = mapEnv.get('B')
-                envC = mapEnv.get('C')
-                envD = mapEnv.get('D')
-               //envE = mapEnv.get('E')
-                envF = mapEnv.get('F')
-
-                reaA = mapRead.get('A')
-                reaB = mapRead.get('B')
-                reaC = mapRead.get('C')
-                reaD = mapRead.get('D')
-                reaF = mapRead.get('F')
-
-                envArr =[envA,envB,envC,envD,envF];
-                reaArr = [reaA, reaB, reaC, reaD, reaF];
-
-                console.log(envArr);
-                console.log(reaArr);
-                var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-                if(attr1=='Environment Grade'){
-                    mainData = envArr;
-                }else{
-                    mainData =  reaArr;
-                }
-
-            // if(attr1== 'Environment Grade'){}
-
-                 var vals = d3.pie()(mainData);
-                 console.log(vals)
-                 var design = d3.arc()
+                            var vals = d3.pie()(mainData);
+                            console.log(vals)
+                            var design = d3.arc()
                                 .padAngle(0.1)
                                 .padRadius(20)
                                 .innerRadius(0)
                                 .outerRadius(250)
-                svg.append("g").attr("transform", "translate(700,300)")
-                   .selectAll("path").data(vals)
-                   .enter()
-                   .append("path")
-                    .attr("d",design)
-                    .attr('color',color)
-                    .attr('fill',function(d){return color(d.data)})
-                    
-                d3.select("g").selectAll("text").data(vals)
-                   .enter().append("text").each(function(d){
-                       var a =design.centroid(d);
-                       d3.select(this).attr("x",a[0]).attr("y",a[1])
-                       .text(function(d){
-                           if(d.index==0){
-                               return 'A'
-                           }else if(d.index==1){
-                               return 'B'
-                           }else if(d.index==2){
-                               return 'C'
-                           }else if(d.index==3){
-                               return 'D'
-                           }else if(d.index==4){
-                               return 'F'
-                           }
-                       });
-                   })
-               
-                      
-                
-                      
-                    });
+                            svg.append("g").attr("transform", "translate(700,300)")
+                                .selectAll("path").data(vals)
+                                .enter()
+                                .append("path")
+                                .attr("d", design)
+                                .attr('color', color)
+                                .attr('fill', function (d) { return color(d.data) })
+
+                            d3.select("g").selectAll("text").data(vals)
+                                .enter().append("text").each(function (d) {
+                                    var a = design.centroid(d);
+                                    d3.select(this).attr("x", a[0]).attr("y", a[1])
+                                        .text(function (d) {
+                                            if (d.index == 0) {
+                                                return 'A'
+                                            } else if (d.index == 1) {
+                                                return 'B'
+                                            } else if (d.index == 2) {
+                                                return 'C'
+                                            } else if (d.index == 3) {
+                                                return 'D'
+                                            } else if (d.index == 4) {
+                                                return 'F'
+                                            }
+                                        });
+                                })
 
 
 
-              //if it's numerical here
-                }else{
-                    console.log("num")
-                    satTakes=[0,0,0,0,0];
-                    satRead= [0,0,0,0,0];
-                    satMath =[0,0,0,0,0];
-                    enroll  =[0,0,0,0,0];
-                    dis     =[0,0,0,0,0];
-                    over    =[0,0,0,0,0];
-                    min     =[0,0,0,0,0];
-                    ell     =[0,0,0,0,0];
 
-                    console.log(1)
-
-                     d3.csv("./Data/cse332hw1.csv").then(function (data) {
-                         data.map(function (d) {
-                             if(d['Num of SAT Test Takers']>=0 && d['Num of SAT Test Takers'] < 200 ){
-                                 satTakes[0]+=1;
-                             }else if(d['Num of SAT Test Takers'] >= 200 && d['Num of SAT Test Takers'] < 400) {
-                                 satTakes[1] += 1;
-                             } else if (d['Num of SAT Test Takers'] >= 400 && d['Num of SAT Test Takers'] < 600) {
-                                 satTakes[2] += 1;
-                             } else if (d['Num of SAT Test Takers'] >= 600 && d['Num of SAT Test Takers'] < 800) {
-                                 satTakes[3] += 1;
-                             } else{
-                                 satTakes[4] += 1;
-                             }
-
-                             if (d['SAT Critical Reading Avg. Score'] >= 250 && d['SAT Critical Reading Avg. Score'] < 350) {
-                                 satRead[0] += 1;
-                             } else if (d['SAT Critical Reading Avg. Score'] >= 350 && d['SAT Critical Reading Avg. Score'] < 450) {
-                                 satRead[1] += 1;
-                             } else if (d['SAT Critical Reading Avg. Score'] >= 450 && d['SAT Critical Reading Avg. Score'] < 550) {
-                                 satRead[2] += 1;
-                             } else if (d['SAT Critical Reading Avg. Score'] >= 550 && d['SAT Critical Reading Avg. Score'] < 650) {
-                                 satRead[3] += 1;
-                             } else {
-                                 satRead[4] += 1;
-                             }
-
-                             if (d['SAT Math Avg. Score'] >= 250 && d['SAT Math Avg. Score'] < 350) {
-                                 satMath[0] += 1;
-                             } else if (d['SAT Math Avg. Score'] >= 350 && d['SAT Math Avg. Score'] < 450) {
-                                 satMath[1] += 1;
-                             } else if (d['SAT Math Avg. Score'] >= 450 && d['SAT Math Avg. Score'] < 550) {
-                                 satMath[2] += 1;
-                             } else if (d['SAT Math Avg. Score'] >= 550 && d['SAT Math Avg. Score'] < 650) {
-                                 satMath[3] += 1;
-                             } else {
-                                 satMath[4] += 1;
-                             }
-
-
-                             if (d['Enrollment'] >= 0 && d['Enrollment'] < 400) {
-                                 enroll[0] += 1;
-                             } else if (d['Enrollment'] >= 400 && d['Enrollment'] < 800) {
-                                 enroll[1] += 1;
-                             } else if (d['Enrollment'] >= 800 && d['Enrollment'] < 1200) {
-                                 enroll[2] += 1;
-                             } else if (d['Enrollment'] >= 1200 && d['Enrollment'] < 1600) {
-                                 enroll[3] += 1;
-                             } else {
-                                 enroll[4] += 1;
-                             }
-
-                             if (d['% Students with Disabilities'] >= 0 && d['% Students with Disabilities'] < 0.05) {
-                                 dis[0] += 1;
-                             } else if (d['% Students with Disabilities'] >= 0.05 && d['% Students with Disabilities'] < 0.1) {
-                                 dis[1] += 1;
-                             } else if (d['% Students with Disabilities'] >= 0.1 && d['% Students with Disabilities'] < 0.15) {
-                                 dis[2] += 1;
-                             } else if (d['% Students with Disabilities'] >= 0.15 && d['% Students with Disabilities'] < 0.2) {
-                                 dis[3] += 1;
-                             } else {
-                                 dis[4] += 1;
-                             }
-
-                             if (d['% Overage'] >= 0 && d['% Overage'] < 0.05) {
-                                 over[0] += 1;
-                             } else if (d['% Overage'] >= 0.05 && d['% Overage'] < 0.1) {
-                                 over[1] += 1;
-                             } else if (d['% Overage'] >= 0.1 && d['% Overage'] < 0.15) {
-                                 over[2] += 1;
-                             } else if (d['% Overage'] >= 0.15 && d['% Overage'] < 0.20) {
-                                 over[3] += 1;
-                             } else {
-                                 over[4] += 1;
-                             }
-
-                             if (d['% Black or Hispanic'] >= 0 && d['% Black or Hispanic'] < 0.2) {
-                                 min[0] += 1;
-                             } else if (d['% Black or Hispanic'] >= 0.2 && d['% Black or Hispanic'] < 0.4) {
-                                 min[1] += 1;
-                             } else if (d['% Black or Hispanic'] >= 0.4 && d['% Black or Hispanic'] < 0.6) {
-                                 min[2] += 1;
-                             } else if (d['% Black or Hispanic'] >= 0.6 && d['% Black or Hispanic'] < 0.8) {
-                                 min[3] += 1;
-                             } else {
-                                 min[4] += 1;
-                             }
+                        });
 
 
 
-                             if (d['% ELL'] >= 0 && d['% ELL'] < 0.2) {
-                                 ell[0] += 1;
-                             } else if (d['% ELL'] >= 0.2 && d['% ELL'] < 0.4) {
-                                 ell[1] += 1;
-                             } else if (d['% ELL'] >= 0.4 && d['% ELL'] < 0.6) {
-                                 ell[2] += 1;
-                             } else if (d['% ELL'] >= 0.6 && d['% ELL'] < 0.8) {
-                                 ell[3] += 1;
-                             } else {
-                                 ell[4] += 1;
-                             }
+                        //if it's numerical here
+                    } else {
+                        console.log("num")
+                        satTakes = [0, 0, 0, 0, 0];
+                        satRead = [0, 0, 0, 0, 0];
+                        satMath = [0, 0, 0, 0, 0];
+                        enroll = [0, 0, 0, 0, 0];
+                        dis = [0, 0, 0, 0, 0];
+                        over = [0, 0, 0, 0, 0];
+                        min = [0, 0, 0, 0, 0];
+                        ell = [0, 0, 0, 0, 0];
 
-                            
+                        console.log(1)
 
-                         })
-                        
-                         if(attr1 =='Num of SAT Test Takers'){
-                             mainData = satTakes;
-                         }else if(attr1=='SAT Critical Reading Avg. Score'){
-                             mainData = satRead;
-                         }else if(attr1 =='SAT Math Avg. Score'){
-                             mainData = satMath;
-                         }else if(attr1 =='Enrollment'){
-                             mainData = enroll;
-                         }else if(attr1 == '% Students with Disabilities'){
-                             mainData = dis;
-                         }else if(attr1 == '% Overage'){
-                             mainData = over;
-                         }else if(attr1 == '% Black or Hispanic'){
-                             mainData = min;
-                         }else{
-                             mainData = ell
-                         }
+                        d3.csv("./Data/cse332hw1.csv").then(function (data) {
+                            data.map(function (d) {
+                                if (d['Num of SAT Test Takers'] >= 0 && d['Num of SAT Test Takers'] < 200) {
+                                    satTakes[0] += 1;
+                                } else if (d['Num of SAT Test Takers'] >= 200 && d['Num of SAT Test Takers'] < 400) {
+                                    satTakes[1] += 1;
+                                } else if (d['Num of SAT Test Takers'] >= 400 && d['Num of SAT Test Takers'] < 600) {
+                                    satTakes[2] += 1;
+                                } else if (d['Num of SAT Test Takers'] >= 600 && d['Num of SAT Test Takers'] < 800) {
+                                    satTakes[3] += 1;
+                                } else {
+                                    satTakes[4] += 1;
+                                }
 
-                        var color = d3.scaleOrdinal(d3.schemeCategory10);
+                                if (d['SAT Critical Reading Avg. Score'] >= 250 && d['SAT Critical Reading Avg. Score'] < 350) {
+                                    satRead[0] += 1;
+                                } else if (d['SAT Critical Reading Avg. Score'] >= 350 && d['SAT Critical Reading Avg. Score'] < 450) {
+                                    satRead[1] += 1;
+                                } else if (d['SAT Critical Reading Avg. Score'] >= 450 && d['SAT Critical Reading Avg. Score'] < 550) {
+                                    satRead[2] += 1;
+                                } else if (d['SAT Critical Reading Avg. Score'] >= 550 && d['SAT Critical Reading Avg. Score'] < 650) {
+                                    satRead[3] += 1;
+                                } else {
+                                    satRead[4] += 1;
+                                }
 
-                        var vals = d3.pie()(mainData);
-                         console.log(vals)
-                         var design = d3.arc()
-                             .padAngle(0.1)
-                             .padRadius(20)
-                             .innerRadius(0)
-                             .outerRadius(250)
-                         svg.append("g").attr("transform", "translate(700,300)")
-                             .selectAll("path").data(vals)
-                             .enter()
-                             .append("path")
-                             .attr("d", design)
-                           //  .attr('color', color)
-                             .attr('fill', function (d) { return color(d.data) })
+                                if (d['SAT Math Avg. Score'] >= 250 && d['SAT Math Avg. Score'] < 350) {
+                                    satMath[0] += 1;
+                                } else if (d['SAT Math Avg. Score'] >= 350 && d['SAT Math Avg. Score'] < 450) {
+                                    satMath[1] += 1;
+                                } else if (d['SAT Math Avg. Score'] >= 450 && d['SAT Math Avg. Score'] < 550) {
+                                    satMath[2] += 1;
+                                } else if (d['SAT Math Avg. Score'] >= 550 && d['SAT Math Avg. Score'] < 650) {
+                                    satMath[3] += 1;
+                                } else {
+                                    satMath[4] += 1;
+                                }
 
-                         d3.select("g").selectAll("text").data(vals)
-                             .enter().append("text").each(function (d) {
-                                 var a = design.centroid(d);
-                                 d3.select(this).attr("x", a[0]).attr("y", a[1])
 
-                                //      .text(function (d) {
-                                //         if(attr1=='Num of SAT Test Takers'){
-                                //          if (d.index == 0) {
-                                //              return '0-199'
-                                //          } else if (d.index == 1) {
-                                //              return '199-399'
-                                //          } else if (d.index == 2) {
-                                //              return '399-599'
-                                //          } else if (d.index == 3) {
-                                //              return '599-799'
-                                //          } else if (d.index == 4) {
-                                //              return '800+'
-                                //          }
-                                //         return 'a'
-                                //     }
-                                // }
-                                     
+                                if (d['Enrollment'] >= 0 && d['Enrollment'] < 400) {
+                                    enroll[0] += 1;
+                                } else if (d['Enrollment'] >= 400 && d['Enrollment'] < 800) {
+                                    enroll[1] += 1;
+                                } else if (d['Enrollment'] >= 800 && d['Enrollment'] < 1200) {
+                                    enroll[2] += 1;
+                                } else if (d['Enrollment'] >= 1200 && d['Enrollment'] < 1600) {
+                                    enroll[3] += 1;
+                                } else {
+                                    enroll[4] += 1;
+                                }
+
+                                if (d['% Students with Disabilities'] >= 0 && d['% Students with Disabilities'] < 0.05) {
+                                    dis[0] += 1;
+                                } else if (d['% Students with Disabilities'] >= 0.05 && d['% Students with Disabilities'] < 0.1) {
+                                    dis[1] += 1;
+                                } else if (d['% Students with Disabilities'] >= 0.1 && d['% Students with Disabilities'] < 0.15) {
+                                    dis[2] += 1;
+                                } else if (d['% Students with Disabilities'] >= 0.15 && d['% Students with Disabilities'] < 0.2) {
+                                    dis[3] += 1;
+                                } else {
+                                    dis[4] += 1;
+                                }
+
+                                if (d['% Overage'] >= 0 && d['% Overage'] < 0.05) {
+                                    over[0] += 1;
+                                } else if (d['% Overage'] >= 0.05 && d['% Overage'] < 0.1) {
+                                    over[1] += 1;
+                                } else if (d['% Overage'] >= 0.1 && d['% Overage'] < 0.15) {
+                                    over[2] += 1;
+                                } else if (d['% Overage'] >= 0.15 && d['% Overage'] < 0.20) {
+                                    over[3] += 1;
+                                } else {
+                                    over[4] += 1;
+                                }
+
+                                if (d['% Black or Hispanic'] >= 0 && d['% Black or Hispanic'] < 0.2) {
+                                    min[0] += 1;
+                                } else if (d['% Black or Hispanic'] >= 0.2 && d['% Black or Hispanic'] < 0.4) {
+                                    min[1] += 1;
+                                } else if (d['% Black or Hispanic'] >= 0.4 && d['% Black or Hispanic'] < 0.6) {
+                                    min[2] += 1;
+                                } else if (d['% Black or Hispanic'] >= 0.6 && d['% Black or Hispanic'] < 0.8) {
+                                    min[3] += 1;
+                                } else {
+                                    min[4] += 1;
+                                }
+
+
+
+                                if (d['% ELL'] >= 0 && d['% ELL'] < 0.2) {
+                                    ell[0] += 1;
+                                } else if (d['% ELL'] >= 0.2 && d['% ELL'] < 0.4) {
+                                    ell[1] += 1;
+                                } else if (d['% ELL'] >= 0.4 && d['% ELL'] < 0.6) {
+                                    ell[2] += 1;
+                                } else if (d['% ELL'] >= 0.6 && d['% ELL'] < 0.8) {
+                                    ell[3] += 1;
+                                } else {
+                                    ell[4] += 1;
+                                }
+
+
+
+                            })
+
+                            if (attr1 == 'Num of SAT Test Takers') {
+                                mainData = satTakes;
+                            } else if (attr1 == 'SAT Critical Reading Avg. Score') {
+                                mainData = satRead;
+                            } else if (attr1 == 'SAT Math Avg. Score') {
+                                mainData = satMath;
+                            } else if (attr1 == 'Enrollment') {
+                                mainData = enroll;
+                            } else if (attr1 == '% Students with Disabilities') {
+                                mainData = dis;
+                            } else if (attr1 == '% Overage') {
+                                mainData = over;
+                            } else if (attr1 == '% Black or Hispanic') {
+                                mainData = min;
+                            } else {
+                                mainData = ell
+                            }
+
+                            var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                            var vals = d3.pie()(mainData);
+                            console.log(vals)
+                            var design = d3.arc()
+                                .padAngle(0.1)
+                                .padRadius(20)
+                                .innerRadius(0)
+                                .outerRadius(250)
+                            svg.append("g").attr("transform", "translate(700,300)")
+                                .selectAll("path").data(vals)
+                                .enter()
+                                .append("path")
+                                .attr("d", design)
+                                //  .attr('color', color)
+                                .attr('fill', function (d) { return color(d.data) })
+
+                            d3.select("g").selectAll("text").data(vals)
+                                .enter().append("text").each(function (d) {
+                                    var a = design.centroid(d);
+                                    d3.select(this).attr("x", a[0]).attr("y", a[1])
+
+                                    //      .text(function (d) {
+                                    //         if(attr1=='Num of SAT Test Takers'){
+                                    //          if (d.index == 0) {
+                                    //              return '0-199'
+                                    //          } else if (d.index == 1) {
+                                    //              return '199-399'
+                                    //          } else if (d.index == 2) {
+                                    //              return '399-599'
+                                    //          } else if (d.index == 3) {
+                                    //              return '599-799'
+                                    //          } else if (d.index == 4) {
+                                    //              return '800+'
+                                    //          }
+                                    //         return 'a'
+                                    //     }
+                                    // }
+
                                     //  .attr('transform',function(d){return "translate(" + design.centroid(d)+ ")"})
                                     //  .style('text-anchor','middle')
-                                     
-                               // );
-                              
 
-
-                        
-                     });
-
-                    
-                 
-                    
+                                    // );
 
 
 
-                    
-                })}
-            
+
+                                });
 
 
 
 
 
-                    
 
-            }else{
-                // scatterplot
+
+
+                        })
+                    }
+
+
+
+
+
+
+
+
+                } else {
+                    // scatterplot
+                }
             }
-        }
-    
-            
-    </script>
-  
+
+
+        </script>
 
 
 
-    
+
+
 </body>
+
 </html>
