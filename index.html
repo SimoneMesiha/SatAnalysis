@@ -36,7 +36,7 @@
         <br>
 
         <div class="dropdown">
-            <select id="variableID2"> choose variable 2
+            <select id="variableID2" onchange="upd(document.getElementById('variableID').value,document.getElementById('variableID2').value)"> choose variable 2
                 <option value=""></option>
                 <option value="# sat takers"># sat takers</option>
                 <option value="sat reading scores">sat reading scores</option>
@@ -49,11 +49,19 @@
                 <option value="% ell">% ell</option>
             </select>
             <br>
-            <select id="graphID" onchange="upd(document.getElementById('variableID').value,'')">
+            <select id="graphID" onchange="upd(document.getElementById('variableID').value,document.getElementById('variableID2').value)">
                 <option value="bar chart">bar chart</option>
                 <option value="pie chart"> pie chart</option>
                 <option value="scatterplot">scatterplot</option>
             </select>
+            <br>
+            <br>
+            <p>Second variable on x or y axis?</p>
+            <select onchange="upd(document.getElementById('variableID2').value,document.getElementById('variableID').value)">
+                <option value="x">x</option>
+                <option value="y">y</option>
+            </select>
+
         </div>
 
         <p1 id="titleee" style="color:red; font-size: 30px;; padding-left: 35%;"></p1>
@@ -66,6 +74,11 @@
 
 
         <script>
+            function swapxy(attr1,attr2){
+                temp = attr1;
+                document.getElementById("variableIdD").value = attr2;
+                document.getElementById("variableIdD2").value = temp;
+            }
 
             function upd(attr1, attr2) {
                 console.log(attr1)
@@ -491,23 +504,46 @@
                                     var a = design.centroid(d);
                                     d3.select(this).attr("x", a[0]).attr("y", a[1])
                                         .text(function (d) {
-                                            if (d.index == 0) {
-                                                return 'A'
-                                            } else if (d.index == 1) {
-                                                return 'B'
-                                            } else if (d.index == 2) {
-                                                return 'C'
-                                            } else if (d.index == 3) {
-                                                return 'D'
-                                            } else if (d.index == 4) {
-                                                return 'F'
-                                            }
-                                        });
-                                })
+                                         
+                                            return ((d.endAngle - d.startAngle) / (2 * Math.PI) * 100).toFixed(1) + '%'
+                                            
+                                        })
+                                        .attr("font-size", "12px")
+                                       
+                                });
+                                var LegendOutline = svg.append("g")
+                                                 .attr("transform", "translate(1000,50)")
+                                                 .selectAll(".legends")
+                                                 .data(vals);
 
-
-
-
+                                var indvidLeg = LegendOutline.enter().append("g")
+                                              .classed('legends',true)
+                                              .attr("transform",function(d,i){
+                                                  return "translate(0," +(i+1)*30+")"
+                                              });
+                                indvidLeg.append("rect")
+                                       .attr("width",20)
+                                       .attr("height",20)
+                                       .attr('fill', function (d) { return color(d.data) })
+                                
+                                       indvidLeg.append("text")
+                                              .text(function(d){
+                                                  console.log(d);
+                                                  if(d.index==0){
+                                                      return 'B'
+                                                  }else if(d.index==1){
+                                                      return 'C'
+                                                  }else if(d.index==2){
+                                                      return 'A'
+                                                  }else if(d.index==3){
+                                                      return 'D'
+                                                  }else{
+                                                      return 'F'
+                                                  }
+                                              })
+                                              .attr('fill', function (d) { return color(d.data) })
+                                              .attr("x",25)
+                                              .attr("y",15)
                         });
 
 
@@ -666,45 +702,109 @@
                                 //  .attr('color', color)
                                 .attr('fill', function (d) { return color(d.data) })
 
-                            d3.select("g").selectAll("text").data(vals)
+                           d3.select("g").selectAll("text").data(vals)
                                 .enter().append("text").each(function (d) {
                                     var a = design.centroid(d);
                                     d3.select(this).attr("x", a[0]).attr("y", a[1])
+                                        .text(function (d) {
 
-                                    //      .text(function (d) {
-                                    //         if(attr1=='Num of SAT Test Takers'){
-                                    //          if (d.index == 0) {
-                                    //              return '0-199'
-                                    //          } else if (d.index == 1) {
-                                    //              return '199-399'
-                                    //          } else if (d.index == 2) {
-                                    //              return '399-599'
-                                    //          } else if (d.index == 3) {
-                                    //              return '599-799'
-                                    //          } else if (d.index == 4) {
-                                    //              return '800+'
-                                    //          }
-                                    //         return 'a'
-                                    //     }
-                                    // }
+                                            return ((d.endAngle - d.startAngle) / (2 * Math.PI) * 100).toFixed(1) + '%'
 
-                                    //  .attr('transform',function(d){return "translate(" + design.centroid(d)+ ")"})
-                                    //  .style('text-anchor','middle')
-
-                                    // );
-
-
-
+                                        })
+                                        .attr("font-size", "12px")
 
                                 });
 
+                                var LegendOutline = svg.append("g")
+                                .attr("transform", "translate(1000,50)")
+                                .selectAll(".legends")
+                                .data(vals);
 
+                            var indvidLeg = LegendOutline.enter().append("g")
+                                .classed('legends', true)
+                                .attr("transform", function (d, i) {
+                                    return "translate(0," + (i + 1) * 30 + ")"
+                                });
+                            indvidLeg.append("rect")
+                                .attr("width", 20)
+                                .attr("height", 20)
+                                .attr('fill', function (d) { return color(d.data) })
 
+                            indvidLeg.append("text")
+                                .text(function (d) {
+                                    console.log(mainData);
+                                    console.log(satRead);
+                                    console.log(satMath);
+                                    console.log(d);
+                                    if(attr1 == 'Num of SAT Test Takers'){
+                                        if(d.index==0){
+                                            return '0-199'
+                                        }else if(d.index==1){
+                                            return '200-399'
+                                        }else if(d.index==2){
+                                            return '400-599'
+                                        }else if(d.index==3){
+                                            return '600-799'
+                                        }else{
+                                            return '800+'
+                                        }
+                                    }else if(attr1=='SAT Critical Reading Avg. Score' || 
+                                    attr1=='SAT Math Avg. Score'){
+                                         if (d.index == 0) {
+                                            return '250-349'
+                                        } else if (d.index == 1) {
+                                            return '350-449'
+                                        } else if (d.index == 2) {
+                                            return '450-549'
+                                        } else if (d.index == 3) {
+                                            return '550-649'
+                                        } else {
+                                            return '650+'
+                                        }
+                                    }else if(attr1 =='Enrollment'){
+                                         if (d.index == 0) {
+                                            return '0-399'
+                                        } else if (d.index == 1) {
+                                            return '400-799'
+                                        } else if (d.index == 2) {
+                                            return '800-1199'
+                                        } else if (d.index == 3) {
+                                            return '1200-1599'
+                                        } else {
+                                            return '1600+'
+                                        }
+                                    }else if(attr1 == '% Students with Disabilities'
+                                    || attr1=='% Overage'){
+                                         if (d.index == 0) {
+                                            return '0-0.049'
+                                        } else if (d.index == 1) {
+                                            return '0.05-0.09'
+                                        } else if (d.index == 2) {
+                                            return '0.1-0.149'
+                                        } else if (d.index == 3) {
+                                            return '0.15-0.19'
+                                        } else {
+                                            return '0.2+'
+                                        }
+                                    }else{
+                                         if (d.index == 0) {
+                                            return '0-0.19'
+                                        } else if (d.index == 1) {
+                                            return '0.20-0.39'
+                                        } else if (d.index == 2) {
+                                            return '0.40-0.59'
+                                        } else if (d.index == 3) {
+                                            return '0.60-0.79'
+                                        } else {
+                                            return '0.8+'
+                                        }
 
-
-
-
-
+                                    }
+                                })
+                                .attr('fill', function (d) { return color(d.data) })
+                                .attr("x", 25)
+                                .attr("y", 15)
+                                                  //      .text(function (d) {
                         })
                     }
 
@@ -717,6 +817,8 @@
 
                 } else {
                     // scatterplot
+                    console.log(attr1);
+                    console.log(attr2);
                 }
             }
 
