@@ -208,7 +208,7 @@
                             .attr("x",-150)
                             .attr("text-anchor", "end")
                             .attr("stroke", "black")
-                            .text("Fixation Duration");
+                            .text("val");
                         
                             console.log(mapEnv);
                         g.selectAll(".bar") //created dynamic bars with our data using the SVG rectangle element.
@@ -218,10 +218,65 @@
                             .attr("class", "bar")
                             .attr("x", function (d) { return xScale(d[attr1]); })  //x scale created earlier and pass the year value from our data.
                             .attr("y", function (d) { 
+                            if(attr1 =='Environment Grade'){
+                               if(d['Environment Grade']=='A'){
                                 return yScale(envArr[0]); 
-                            }) // pass the data value to our y scale and receive the corresponding y value from the y range.
+                               }else if(d['Environment Grade'] == 'B') {
+                                   return yScale(envArr[1]);
+                               }else if(d['Environment Grade'] == 'C'){
+                                   return yScale(envArr[2]);
+                               }else if(d['Environment Grade'] == 'D'){
+                                   return yScale(envArr[3])
+                               }else{
+                                   return yScale(envArr[4]);
+                               }
+                            }else{
+                                if (attr1 == 'College and Career Readiness Grade') {
+                                    if (d['College and Career Readiness Grade'] == 'A') {
+                                        return yScale(reaArr[0]);
+                                    } else if (d['College and Career Readiness Grade'] == 'B') {
+                                        return yScale(reaArr[1]);
+                                    } else if (d['College and Career Readiness Grade'] == 'C') {
+                                        return yScale(reaArr[2]);
+                                    } else if (d['College and Career Readiness Grade'] == 'D') {
+                                        return yScale(reaArr[3])
+                                    } else {
+                                        return yScale(reaArr[4]);
+                                    }
+                            }
+                            }
+                        }) // pass the data value to our y scale and receive the corresponding y value from the y range.
                             .attr("width", xScale.bandwidth()) //width of our bars would be determined by the scaleBand() function.
-                            .attr("height", function (d) { return height - yScale(envArr[0]); }); //height of the bar would be calculated as height - yScale(d.value)
+                            .attr("height", function (d) {
+                             if (attr1 == 'Environment Grade') {
+                                if(d['Environment Grade'] == 'A'){
+                                 return height - yScale(envArr[0]); 
+                                }else if(d['Environment Grade'] == 'B'){
+                                    return height - yScale(envArr[1]);
+                                }else if(d['Environment Grade'] == 'C'){
+                                    return height - yScale(envArr[2]);
+                                }else if(d['Environment Grade'] == 'D') {
+                                    return height - yScale(envArr[3]);
+                                }else{
+                                    return height-yScale(envArr[4]);
+                                }
+                            }else{
+                                 if (attr1 == 'College and Career Readiness Grade') {
+                                     if (d['College and Career Readiness Grade'] == 'A') {
+                                         return height - yScale(reaArr[0]);
+                                     } else if (d['College and Career Readiness Grade'] == 'B') {
+                                         return height - yScale(reaArr[1]);
+                                     } else if (d['College and Career Readiness Grade'] == 'C') {
+                                         return height - yScale(reaArr[2]);
+                                     } else if (d['College and Career Readiness Grade'] == 'D') {
+                                         return height - yScale(reaArr[3]);
+                                     } else {
+                                         return height - yScale(reaArr[4]);
+                                     }
+
+                            }
+                        }
+                            }); //height of the bar would be calculated as height - yScale(d.value)
                         //the height of the SVG minus the corresponding y-value of the bar from the y-scale
                         console.log(g);
 
