@@ -21,7 +21,7 @@
 
 <body>
     <div class="dropdown">
-        <select id="variableID" onchange="upd(document.getElementById('variableID').value,'')"> choose a variable
+        <select id="variableID" onchange="upd(document.getElementById('variableID').value,document.getElementById('variableID2').value)"> choose a variable
             <option value="Num of SAT Test Takers"># sat takers</option>
             <option value="SAT Critical Reading Avg. Score">sat reading scores</option>
             <option value="SAT Math Avg. Score">sat math scores</option>
@@ -38,15 +38,15 @@
         <div class="dropdown">
             <select id="variableID2" onchange="upd(document.getElementById('variableID').value,document.getElementById('variableID2').value)"> choose variable 2
                 <option value=""></option>
-                <option value="# sat takers"># sat takers</option>
-                <option value="sat reading scores">sat reading scores</option>
-                <option value="sat math score">sat math score</option>
-                <option value="env grade">env grade</option>
-                <option value="college and readiness grade">college and readiness grade</option>
-                <option value="% disability">% disability</option>
-                <option value="% overage">% overage</option>
-                <option value="% minority">% minority</option>
-                <option value="% ell">% ell</option>
+                <option value="Num of SAT Test Takers"># sat takers</option>
+                <option value="SAT Critical Reading Avg. Score">sat reading scores</option>
+                <option value="SAT Math Avg. Score">sat math score</option>
+                <option value="Environment Grade">env grade</option>
+                <option value="College and Career Readiness Grade">college and readiness grade</option>
+                <option value="% Students with Disabilities">% disability</option>
+                <option value="% Overage">% overage</option>
+                <option value="% Black or Hispanic">% minority</option>
+                <option value="% ELL">% ell</option>
             </select>
             <br>
             <select id="graphID" onchange="upd(document.getElementById('variableID').value,document.getElementById('variableID2').value)">
@@ -58,8 +58,8 @@
             <br>
             <p>Second variable on x or y axis?</p>
             <select onchange="upd(document.getElementById('variableID2').value,document.getElementById('variableID').value)">
-                <option value="x">x</option>
-                <option value="y">y</option>
+                <option value="x">y</option>
+                <option value="y">x</option>
             </select>
 
         </div>
@@ -74,6 +74,14 @@
 
 
         <script>
+            function isccategorical(attr){
+                if(attr=='Environment Grade'|| attr=='College and Career Readiness Grade'){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+
             function swapxy(attr1,attr2){
                 temp = attr1;
                 document.getElementById("variableIdD").value = attr2;
@@ -113,11 +121,6 @@
                             .attr("font-weight", "bold")
                             .attr("text-decoration", "underline")
                             .text(attr1 + " Data")
-
-                        // var xScale = d3.scaleBand().range([0, width]).padding(0.4);//scaleband to make
-                        // //all the element the x axis the same width
-                        // var yScale = d3.scaleLinear().range([height, 0]);//a linear scale for the y-axis 
-
                         var g = svg.append("g") // adding a grouping of svg elements. Inside this we will 
                             //update our values
                             .attr("transform", "translate(" + 100 + "," + 100 + ")"); // just position it nicely
@@ -819,6 +822,95 @@
                     // scatterplot
                     console.log(attr1);
                     console.log(attr2);
+                    if(attr2==''){
+                        return;
+                    }else{
+                        //making sure the second  val is not null;
+                        //both numerical
+                        if(isccategorical(attr1)==false && isccategorical(attr2)==false){
+                            var svg = d3.select("svg"),
+                                margin = 200,
+                                width = svg.attr("width") - margin,
+                                height = svg.attr("height") - margin
+                           
+
+                            svg.append("text")
+                                .attr("x",400)
+                                .attr("y",50)
+                                .attr("font-size","24px")
+                                .attr("font-weight", "bold")
+                                .attr("text-decoration", "underline")
+                                .text(attr1 + " Vs " + attr2);
+
+                          
+                           // var xScale = d
+                           
+                           values = [];
+                           var g = svg.append("g") // element where x axis and all will be added
+                                .attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+                           d3.csv("./Data/cse332hw1.csv").then(function(data){
+                               data.map(function(d){
+                                   elem = new Object();
+                                   elem.firstAtt  =d[attr1]
+                                   elem.secondAtt =d[attr2]
+                                   values.push(elem)
+
+                               })
+                               console.log(values);
+                               console.log(values[0].firstAtt);
+
+                               var xScale = d3.scaleLinear()
+                                               .range([0,width])
+                                               .domain([d3.min(values,
+                                               function(d){
+                                                   return d.firstAtt
+                                               })
+                                               ,d3.max(values,function(d){
+                                                   return d.firstAtt
+                                               })
+                                            ]);
+                               console.log(1);
+                                var yScale = d3.scaleLinear()
+                                   .range([height, 0])
+                                   .domain([d3.min(values, function(d){return d.secondAtt}),
+                                            d3.max(values, function(d){return d.secondAtt})]);
+                                console.log(2)
+                                g.append("g")
+                                   .attr("transform", "translate(0," + height + ")")
+                                   .call(d3.axisBottom().tickSizeOuter(0).scale(xScale).ticks(7))
+
+                                   .append("text")
+                                   .attr("x", 350)
+                                    .attr("y", 30)
+                                   .attr("text-anchor", "end")
+                                   .attr("stroke", "black")
+                                   .text(attr1);
+
+                               g.append("g")
+                                   .call(d3.axisLeft(yScale)
+                                       .ticks(10).tickSizeOuter(0))
+                                   .append("text")
+                                   .attr("transform", "rotate(-90)")
+                                   .attr("y", 6)
+                                   .attr("dy", "-5.1em")
+                                   .attr("text-anchor", "end")
+                                   .attr("stroke", "black")
+                                   .text(attr2);
+
+                               
+
+
+
+                           })
+
+
+
+
+
+                        }
+
+                    }
                 }
             }
 
