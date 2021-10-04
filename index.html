@@ -848,22 +848,33 @@
                            values = [];
                            var g = svg.append("g") // element where x axis and all will be added
                                 .attr("transform", "translate(" + 100 + "," + 100 + ")");
-
+                            console.log("fsdjhadf")
                            d3.csv("./Data/cse332hw1.csv").then(function(data){
                                data.map(function(d){
                                    elem = new Object();
-                                   elem.firstAtt  =d[attr1]
-                                   elem.secondAtt =d[attr2]
+                                   //console.log(d[attr1]);
+                                   //console.log(d[attr2]);
+                                   elem.firstAtt  =parseFloat(d[attr1])
+                                   elem.secondAtt =parseFloat(d[attr2])
                                    values.push(elem)
+                                   
 
                                })
-                               console.log(values);
-                               console.log(values[0].firstAtt);
+                               //console.log(values);
+                               
+                              // console.log(typeof values[0].firstAtt);
+                                //console.log(typeof values[0].secondAtt);
+
 
                                var xScale = d3.scaleLinear()
                                 .range([0, width])
                                 .domain([0,
-                                       d3.max(values, function (d) { return d.firstAtt })]);
+                                       d3.max(values, function (d) { 
+                                         //  console.log(d)
+                                           //console.log(values);
+                                           //console.log(typeof d.firstAtt)
+                                           console.log(typeof d.firstAtt)
+                                           return d.firstAtt })]);
                                
                                
                                          
@@ -894,7 +905,7 @@
                                    .append("text")
                                    .attr("transform", "rotate(-90)")
                                    .attr("y", 6)
-                                //    .attr("dy", "-5.1em")
+                                   .attr("dy", "-5.1em")
                                    .attr("text-anchor", "end")
                                    .attr("stroke", "black")
                                    .text(attr2);
@@ -906,8 +917,8 @@
                                        .data(values)
                                        .enter()
                                        .append("circle")
-                                       .attr("cx",function(d){return parseFloat(xScale(d.firstAtt))})
-                                       .attr("cy",function(d){return parseFloat(yScale(d.secondAtt))})
+                                       .attr("cx",function(d){return (xScale(d.firstAtt))})
+                                       .attr("cy",function(d){return (yScale(d.secondAtt))})
                                       
                                        .attr("r",3)
                                        .style("fill","#3d5d55");
@@ -949,6 +960,9 @@
                                     elem = new Object();
                                     elem.firstAtt = d[attr1]
                                     elem.secondAtt = d[attr2]
+                                    console.log( d[attr2]);
+                                    console.log( d[attr1]);
+
                                     values.push(elem)
 
                                 })
@@ -1008,13 +1022,211 @@
                                     .append("circle")
                                     .attr("cx", function (d) { return (xScale(d.firstAtt)) })
                                     .attr("cy", function (d) { return (yScale(d.secondAtt)) })
-                                    .attr("x",10000)
+                                    //.attr("x",1000)
 
                                     .attr("r", 3)
                                     .style("fill", "#3d5d55");
 
                             })
 
+
+
+
+
+                        }else if(isccategorical(attr1)==true){
+                             var svg = d3.select("svg"),
+                                margin = 200,
+                                width = svg.attr("width") - margin,
+                                height = svg.attr("height") - margin
+                            console.log("djfakdsfhads")
+
+
+                            svg.append("text")
+                                .attr("x", 400)
+                                .attr("y", 50)
+                                .attr("font-size", "24px")
+                                .attr("font-weight", "bold")
+                                .attr("text-decoration", "underline")
+                                .text(attr1 + " Vs " + attr2);
+
+
+                            // var xScale = d
+
+                            values = [];
+                            var g = svg.append("g") // element where x axis and all will be added
+                                .attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+                            d3.csv("./Data/cse332hw1.csv").then(function (data) {
+                                data.map(function (d) {
+                                    elem = new Object();
+                                    elem.firstAtt = d[attr1]
+                                    elem.secondAtt = d[attr2]
+                                    console.log(d[attr2]);
+                                    console.log(d[attr1]);
+
+                                    values.push(elem)
+
+                                })
+                                console.log(values);
+                                console.log(values[0].firstAtt);
+
+                                var xScale = d3.scaleBand()
+                                    .range([0, width])
+                                    .padding(0.4)
+                                    .domain(data.map(function (d) {
+                                        return d[attr1];
+                                    }));;
+
+
+
+
+
+                                console.log(1);
+                                var yScale = d3.scaleLinear()
+                                    .range([height, 0])
+                                    .domain([d3.min(values, function (d) { return d.secondAtt }),
+                                    d3.max(values, function (d) { return d.secondAtt })]);
+
+
+
+                                console.log(2)
+                                g.append("g")
+                                    .attr("transform", "translate(0," + height + ")")
+                                    .call(d3.axisBottom().tickSizeOuter(0).scale(xScale))
+
+                                    .append("text")
+                                    .attr("x", 350)
+                                    .attr("y", 30)
+                                    .attr("text-anchor", "end")
+                                    .attr("stroke", "black")
+                                    .text(attr1);
+
+                                g.append("g")
+                                    .call(d3.axisLeft(yScale)
+                                        .tickSizeOuter(0))
+                                    .append("text")
+                                    .attr("transform", "rotate(-90)")
+                                    .attr("y", 6)
+                                    //    .attr("dy", "-5.1em")
+                                    .attr("text-anchor", "end")
+                                    .attr("stroke", "black")
+                                    .text(attr2);
+
+                                //now we gotta append the points
+
+                                svg.append("g")
+                                    .selectAll('points')
+                                    .data(values)
+                                    .enter()
+                                    .append("circle")
+                                    .attr("cx", function (d) { return (xScale(d.firstAtt)) })
+                                    .attr("cy", function (d) { return (yScale(d.secondAtt)) })
+                                    //.attr("x",1000)
+
+                                    .attr("r", 3)
+                                    .style("fill", "#3d5d55");
+
+                            })
+
+                        }else{
+
+
+
+                            var svg = d3.select("svg"),
+                                margin = 200,
+                                width = svg.attr("width") - margin,
+                                height = svg.attr("height") - margin
+                            console.log("djfakdsfhads")
+
+
+                            svg.append("text")
+                                .attr("x", 400)
+                                .attr("y", 50)
+                                .attr("font-size", "24px")
+                                .attr("font-weight", "bold")
+                                .attr("text-decoration", "underline")
+                                .text(attr1 + " Vs " + attr2);
+
+
+                            // var xScale = d
+
+                            values = [];
+                            var g = svg.append("g") // element where x axis and all will be added
+                                .attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+                            d3.csv("./Data/cse332hw1.csv").then(function (data) {
+                                data.map(function (d) {
+                                    elem = new Object();
+                                    elem.firstAtt = d[attr1]
+                                    elem.secondAtt = d[attr2]
+                                    console.log(d[attr2]);
+                                    console.log(d[attr1]);
+
+                                    values.push(elem)
+
+                                })
+                                console.log(values);
+                                console.log(values[0].firstAtt);
+
+                                var xScale = d3.scaleLinear()
+                                    .range([0, width])
+                                    .domain(data.map(function (d) {
+                                        return d[attr1];
+                                    }));;
+
+
+
+
+
+                                console.log(1);
+                                var yScale = d3.scaleBand()
+                                    .range([height, 0])
+                                    .padding(0.4)
+                                    .domain(data.map(function (d) {
+                                        return d[attr2];
+                                    }));;
+
+
+
+                                console.log(2)
+                                g.append("g")
+                                    .attr("transform", "translate(0," + height + ")")
+                                    .call(d3.axisBottom().tickSizeOuter(0).scale(xScale))
+
+                                    .append("text")
+                                    .attr("x", 350)
+                                    .attr("y", 30)
+                                    .attr("text-anchor", "end")
+                                    .attr("stroke", "black")
+                                    .text(attr1);
+
+                                g.append("g")
+                                    .call(d3.axisLeft(yScale)
+                                        .tickSizeOuter(0))
+                                    .append("text")
+                                    .attr("transform", "rotate(-90)")
+                                    .attr("y", 6)
+                                    //    .attr("dy", "-5.1em")
+                                    .attr("text-anchor", "end")
+                                    .attr("stroke", "black")
+                                    .text(attr2);
+
+                                //now we gotta append the points
+
+                                svg.append("g")
+                                    .selectAll('points')
+                                    .data(values)
+                                    .enter()
+                                    .append("circle")
+                                    .attr("cx", function (d) { return (xScale(d.firstAtt)) })
+                                    .attr("cy", function (d) { return (yScale(d.secondAtt)) })
+                                    //.attr("x",1000)
+
+                                    .attr("r", 3)
+                                    .style("fill", "#3d5d55");
+
+                            })
+                            
                         }
 
                     }
