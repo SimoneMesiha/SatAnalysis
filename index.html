@@ -400,14 +400,14 @@
                          
 
                             var histogram = d3.histogram()
-                                .value(function(d){parseFloat(d[attr1])})
+                                .value(function(d){return parseFloat(d[attr1])})
                                 .domain(xScale.domain())
-                                .thresholds(xScale.ticks(10))
+                                .thresholds(xScale.ticks(50))
                             
                             var bins = histogram(data)
                             console.log(bins)
-                            
-                           var yScale = d3.scaleLinear().range([height,0]).domain([0,1000])
+                        
+                           var yScale = d3.scaleLinear().range([height,0]).domain([0,100])
 
                         
                             g.append("g") //Another group element to have our y-axis grouped under one group element
@@ -423,15 +423,19 @@
                                  .attr("stroke", "black")
                                  .text("val");
 
-                            g.selectAll("rect")
-                              .data(bins)
-                              .join("rect")
-                              .attr("x",1)
-                             .attr("transform", function (d) {
-                                 console.log(d.length)
+                            g.selectAll(".bar") //created dynamic bars with our data using the SVG rectangle element.
+                            .data(bins)
+                            .enter()
+                            .append("rect")
+                            .attr("class", "bar")
+                            .attr("x",1)
+                            .attr("transform", function (d) {
+                                console.log(data)
+                                 console.log(bins.length)
+                                 console.log(bins)
                                 return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
                             .attr("width", function (d) { return xScale(d.x1) - xScale(d.x0) - 1 })
-                                .attr("height", function (d) { return height - yScale(d.length); })
+                            .attr("height", function (d) { return height - yScale(d.length); })
                             })
                             
 
