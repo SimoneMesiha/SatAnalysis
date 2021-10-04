@@ -323,76 +323,16 @@
                  
                         var g = svg.append("g")
                             .attr("transform", "translate(" + 100 + "," + 100 + ")");
-                             //     var xScale = d3.scaleLinear().range([0, width]);
-                    //     yScale = d3.scaleLinear().range([height, 0]);
-
-                    //     d3.csv("./Data/cse332hw1.csv").then(function (data) {
-                    //         console.log(data);
-                    //         console.log(data.map(function (d) { return d[attr1]; console.log(d[attr1]) }));
-                    //         if (attr1 == 'Enrollment') {
-                    //           xScale.domain([0,5500])
-                    //             console.log()
-                              
-                    //         } else if((attr1 == 'Num of SAT Test Takers')) {
-                    //             xScale.domain([0, 1300]);
-                    //         }else if(attr1 == 'SAT Critical Reading Avg. Score') {
-                    //             xScale.domain([200, 800]);
-                    //         }else if(attr1 =='SAT Math Avg. Score'){
-                    //              xScale.domain([200, 800]);
-                    //         }else{
-                    //             xScale.domain([0,1])
-                    //         }
-
-                    //         yScale.domain([0,
-                    //             d3.max(data, function (d) {
-                    //                 return d['SAT Math Avg. Score']
-                    //             })])
-
-
-                    //         g.append("g")
-                    //             .attr("transform", "translate(0," + height + ")")
-                    //             .call(d3.axisBottom().tickSizeOuter(0).scale(xScale).ticks(7))
-
-                    //             .append("text")
-                    //             .attr("y", height - 250)
-                    //             .attr("x", width - 100)
-                    //             .attr("text-anchor", "end")
-                    //             .attr("stroke", "black")
-                    //             .text("hello");
-
-                    //         g.append("g")
-                    //             .call(d3.axisLeft(yScale)
-                    //                 .ticks(10).tickSizeOuter(0))
-                    //             .append("text")
-                    //             .attr("transform", "rotate(-90)")
-                    //             .attr("y", 6)
-                    //             .attr("dy", "-5.1em")
-                    //             .attr("text-anchor", "end")
-                    //             .attr("stroke", "black")
-                    //             .text("math scores");
-
-
-                    //         g.selectAll(".bar")
-                    //             .data(data)
-                    //             .enter().append("rect")
-                    //             .attr("class", "bar")
-                    //             .attr("x", function (d) { return xScale(d[attr1]); })
-                    //             .attr("y", function (d) { return yScale(d['SAT Math Avg. Score']); })
-                    //             .attr("width", 2)
-                    //             .attr("height", function (d) { return height - yScale(d['SAT Math Avg. Score']); });
-                    //         console.log(g);
-                    //     });
-
-
-
 
                          d3.csv("./Data/cse332hw1.csv").then(function (data) {
-                             var xScale = d3.scaleLinear().domain([0,1000]).range([0,width])
+                             var xScale;
+                            
+                             xScale = d3.scaleLinear().domain([0,d3.max(data,function(d){return parseFloat(d[attr1])})*1.05]).range([0,width])
                              g.append("g")
                               .attr("transform", "translate(0," + height + ")")
-                              .call(d3.axisBottom(xScale).tickSizeOuter(0).scale(xScale).ticks(7))
+                              .call(d3.axisBottom(xScale).tickSizeOuter(0).scale(xScale).ticks(10))
                               .append("text")
-                              .attr("x", 350)
+                              .attr("x", 520)
                               .attr("y", 30)
                               .attr("text-anchor", "end")
                               .attr("stroke", "black")
@@ -404,10 +344,16 @@
                                 .domain(xScale.domain())
                                 .thresholds(xScale.ticks(50))
                             
+                            max=0;
                             var bins = histogram(data)
                             console.log(bins)
+                            for(i=0;i<bins.length;i++){
+                                if(bins[i].length>max){
+                                    max= bins[i].length;
+                                }
+                            }
                         
-                           var yScale = d3.scaleLinear().range([height,0]).domain([0,100])
+                           var yScale = d3.scaleLinear().range([height,0]).domain([0,max])
 
                         
                             g.append("g") //Another group element to have our y-axis grouped under one group element
@@ -421,7 +367,7 @@
                                  .attr("x", -150)
                                  .attr("text-anchor", "end")
                                  .attr("stroke", "black")
-                                 .text("val");
+                                 .text("Frequency");
 
                             g.selectAll(".bar") //created dynamic bars with our data using the SVG rectangle element.
                             .data(bins)
