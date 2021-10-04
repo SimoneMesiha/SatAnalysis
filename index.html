@@ -861,24 +861,25 @@
                                console.log(values[0].firstAtt);
 
                                var xScale = d3.scaleLinear()
-                                               .range([0,width])
-                                               .domain([d3.min(values,
-                                               function(d){
-                                                   return d.firstAtt
-                                               })
-                                               ,d3.max(values,function(d){
-                                                   return d.firstAtt
-                                               })
-                                            ]);
+                                .range([0, width])
+                                .domain([0,
+                                       d3.max(values, function (d) { return d.firstAtt })]);
+                               
+                               
+                                         
+                                              
+                                        
                                console.log(1);
                                 var yScale = d3.scaleLinear()
-                                   .range([height, 0])
-                                   .domain([d3.min(values, function(d){return d.secondAtt}),
-                                            d3.max(values, function(d){return d.secondAtt})]);
+                                .range([height, 0])
+                                .domain([d3.min(values, function (d) { return d.secondAtt }),
+                                d3.max(values, function (d) { return d.secondAtt })]);
+                                  
+                                   
                                 console.log(2)
                                 g.append("g")
                                    .attr("transform", "translate(0," + height + ")")
-                                   .call(d3.axisBottom().tickSizeOuter(0).scale(xScale).ticks(7))
+                                   .call(d3.axisBottom().tickSizeOuter(0).scale(xScale))
 
                                    .append("text")
                                    .attr("x", 350)
@@ -889,14 +890,28 @@
 
                                g.append("g")
                                    .call(d3.axisLeft(yScale)
-                                       .ticks(10).tickSizeOuter(0))
+                                       .tickSizeOuter(0))
                                    .append("text")
                                    .attr("transform", "rotate(-90)")
                                    .attr("y", 6)
-                                   .attr("dy", "-5.1em")
+                                //    .attr("dy", "-5.1em")
                                    .attr("text-anchor", "end")
                                    .attr("stroke", "black")
                                    .text(attr2);
+
+                                   //now we gotta append the points
+                               
+                                   svg.append("g")
+                                       .selectAll('points')
+                                       .data(values)
+                                       .enter()
+                                       .append("circle")
+                                       .attr("cx",function(d){return parseFloat(xScale(d.firstAtt))})
+                                       .attr("cy",function(d){return parseFloat(yScale(d.secondAtt))})
+                                      
+                                       .attr("r",3)
+                                       .style("fill","#3d5d55");
+                                       
 
                                
 
