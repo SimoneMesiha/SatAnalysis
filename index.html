@@ -43,6 +43,7 @@
                 <option value="SAT Math Avg. Score">sat math score</option>
                 <option value="Environment Grade">env grade</option>
                 <option value="College and Career Readiness Grade">college and readiness grade</option>
+                <option value="Enrollment">Enrollment</option>
                 <option value="% Students with Disabilities">% disability</option>
                 <option value="% Overage">% overage</option>
                 <option value="% Black or Hispanic">% minority</option>
@@ -828,7 +829,7 @@
                     console.log(attr1);
                     console.log(attr2);
                     if(attr2==''){
-                        return;
+                        alert("you can't have a scatter plot with only one variable");
                     }else{
                         //making sure the second  val is not null;
                         //both numerical
@@ -925,14 +926,8 @@
                                       
                                        .attr("r",3)
                                        .style("fill","#3d5d55");
-                                       
-
-                               
-
-
-
+                                    
                            })
-
 
                         //both categorical
                         }else if(isccategorical(attr1)==true && isccategorical(attr2)==true){
@@ -975,7 +970,7 @@
                                 var xScale = d3.scaleBand()
                                     .range([0, width])
                                     .padding(0.4)
-                                     .domain(data.map(function (d) {
+                                    .domain(data.map(function (d) {
                                         return d[attr1];
                                     }));;
 
@@ -996,10 +991,10 @@
                                 console.log(2)
                                 g.append("g")
                                     .attr("transform", "translate(0," + height + ")")
-                                    .call(d3.axisBottom().tickSizeOuter(0).scale(xScale))
+                                    .call(d3.axisBottom(xScale).tickSizeOuter(0))
 
                                     .append("text")
-                                    .attr("x", 350)
+                                    .attr("x", 520)
                                     .attr("y", 30)
                                     .attr("text-anchor", "end")
                                     .attr("stroke", "black")
@@ -1011,7 +1006,7 @@
                                     .append("text")
                                     .attr("transform", "rotate(-90)")
                                     .attr("y", 6)
-                                    //    .attr("dy", "-5.1em")
+                                    .attr("dy", "-5.1em")
                                     .attr("text-anchor", "end")
                                     .attr("stroke", "black")
                                     .text(attr2);
@@ -1023,10 +1018,11 @@
                                     .data(values)
                                     .enter()
                                     .append("circle")
-                                    .attr("cx", function (d) { return (xScale(d.firstAtt)) })
-                                    .attr("cy", function (d) { return (yScale(d.secondAtt)) })
+                                    .attr("cx", function (d) { 
+                                         console.log("og "+ d.firstAtt + " now: "+xScale(d.firstAtt))
+                                        return (xScale(d.firstAtt)+60) })
+                                    .attr("cy", function (d) { return (yScale(d.secondAtt)+20) })
                                     //.attr("x",1000)
-
                                     .attr("r", 3)
                                     .style("fill", "#3d5d55");
 
@@ -1063,7 +1059,7 @@
                                 data.map(function (d) {
                                     elem = new Object();
                                     elem.firstAtt = d[attr1]
-                                    elem.secondAtt = d[attr2]
+                                    elem.secondAtt = parseFloat(d[attr2])
                                     console.log(d[attr2]);
                                     console.log(d[attr1]);
 
@@ -1087,15 +1083,15 @@
                                 console.log(1);
                                 var yScale = d3.scaleLinear()
                                     .range([height, 0])
-                                    .domain([d3.min(values, function (d) { return d.secondAtt }),
-                                    d3.max(values, function (d) { return d.secondAtt })]);
+                                    .domain([0,
+                                    d3.max(values, function (d) { return d.secondAtt })*1.1]);
 
 
 
                                 console.log(2)
                                 g.append("g")
                                     .attr("transform", "translate(0," + height + ")")
-                                    .call(d3.axisBottom().tickSizeOuter(0).scale(xScale))
+                                    .call(d3.axisBottom(xScale).tickSizeOuter(0))
 
                                     .append("text")
                                     .attr("x", 350)
@@ -1110,7 +1106,7 @@
                                     .append("text")
                                     .attr("transform", "rotate(-90)")
                                     .attr("y", 6)
-                                    //    .attr("dy", "-5.1em")
+                                    .attr("dy", "-5.1em")
                                     .attr("text-anchor", "end")
                                     .attr("stroke", "black")
                                     .text(attr2);
@@ -1122,7 +1118,7 @@
                                     .data(values)
                                     .enter()
                                     .append("circle")
-                                    .attr("cx", function (d) { return (xScale(d.firstAtt)) })
+                                    .attr("cx", function (d) { return (xScale(d.firstAtt))+58 })
                                     .attr("cy", function (d) { return (yScale(d.secondAtt)) })
                                     //.attr("x",1000)
 
@@ -1160,7 +1156,7 @@
                             d3.csv("./Data/cse332hw1.csv").then(function (data) {
                                 data.map(function (d) {
                                     elem = new Object();
-                                    elem.firstAtt = d[attr1]
+                                    elem.firstAtt = parseFloat(d[attr1])
                                     elem.secondAtt = d[attr2]
                                     console.log(d[attr2]);
                                     console.log(d[attr1]);
@@ -1172,9 +1168,10 @@
                                 console.log(values[0].firstAtt);
 
                                 var xScale = d3.scaleLinear()
-                                    .range([0, width])
-                                    .domain([d3.min(values,function(d){return values.firstAtt})
-                                            ,d3.max(values,function(d){return values.firstAtt})]);;
+                                 .domain([0
+                                        , d3.max(values, function (d) { return d.firstAtt })])
+                                .range([0, width])
+                                   
 
 
 
@@ -1184,16 +1181,15 @@
                                 var yScale = d3.scaleBand()
                                     .range([height, 0])
                                     .padding(0.4)
-                                    .domain([d3.min(values, function (d) { return values.secondAtt })
-                                        , d3.max(values, function (d) { return values.secondAtt })])
-                                    ;
+                                    .domain(data.map(function(d){return d[attr2]}));
+                                    
 
 
 
                                 console.log(2)
                                 g.append("g")
                                     .attr("transform", "translate(0," + height + ")")
-                                    .call(d3.axisBottom().tickSizeOuter(0).scale(xScale))
+                                    .call(d3.axisBottom(xScale))
 
                                     .append("text")
                                     .attr("x", 350)
@@ -1225,7 +1221,7 @@
                                          return (xScale(d.firstAtt)) })
                                     .attr("cy", function (d) {
                                         console.log(d.secondAtt);
-                                        return (yScale(d.secondAtt)) })
+                                        return (yScale(d.secondAtt)) +23})
                                     //.attr("x",1000)
 
                                     .attr("r", 3)
