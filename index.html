@@ -12,6 +12,16 @@
         .bar {
             fill: lightblue;
         }
+        .container{
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+        #items{
+            margin-left: 5%;
+            margin-right: 5%;
+        }
     </style>
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
@@ -20,7 +30,8 @@
 </head>
 
 <body>
-    <div class="dropdown">
+<div class="container" >
+    <div class="dropdown" id="item">
         <select id="variableID" onchange="upd(document.getElementById('variableID').value,document.getElementById('variableID2').value)"> choose a variable
             <option value="Num of SAT Test Takers"># sat takers</option>
             <option value="SAT Critical Reading Avg. Score">sat reading scores</option>
@@ -34,8 +45,8 @@
             <option value="% ELL">% ell</option>
         </select>
         <br>
-
-        <div class="dropdown">
+    </div>
+        <div class="dropdown"id="item">
             <select id="variableID2" onchange="upd(document.getElementById('variableID').value,document.getElementById('variableID2').value)"> choose variable 2
                 <option value=""></option>
                 <option value="Num of SAT Test Takers"># sat takers</option>
@@ -49,6 +60,7 @@
                 <option value="% Black or Hispanic">% minority</option>
                 <option value="% ELL">% ell</option>
             </select>
+            </div>
             <br>
             <select id="graphID" onchange="upd(document.getElementById('variableID').value,document.getElementById('variableID2').value)">
                 <option value="bar chart">bar chart</option>
@@ -58,12 +70,13 @@
             <br>
             <br>
             <p>Second variable on x or y axis?</p>
-            <select onchange="upd(document.getElementById('variableID2').value,document.getElementById('variableID').value)">
+            <select onchange="asdfs(document.getElementById('variableID').value,document.getElementById('variableID2').value)">
                 <option value="x">y</option>
                 <option value="y">x</option>
             </select>
 
         </div>
+    </div>
 
         <p1 id="titleee" style="color:red; font-size: 30px;; padding-left: 35%;"></p1>
         <br>
@@ -79,11 +92,19 @@
                     return false;
                 }
             }
+            function asdfs(attr1,attr2){
+                console.log("hello")
+                swapxy(attr1,attr2);
+                upd(attr1,attr2);
+            }
 
             function swapxy(attr1,attr2){
+                console.log(attr1)
+                console.log(attr2)
                 temp = attr1;
-                document.getElementById("variableIdD").value = attr2;
-                document.getElementById("variableIdD2").value = temp;
+                console.log(document.getElementById("variableIdD"))
+                document.getElementById("variableID").value = attr2;
+                document.getElementById("variableID2").value = temp;
             }
 
             function upd(attr1, attr2) {
